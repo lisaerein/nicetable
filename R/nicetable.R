@@ -35,7 +35,13 @@
 #' @param dispN Whether to display number non-missing for continuous variables. Default = FALSE. 
 #' dispN will overwrite dispmiss if both are TRUE.
 #' @param printRMD Whether to print resulting table to Rmd via xtable. Default = TRUE.
-#' @keywords summary table 
+#' @param percent Should row (1) or column (2, default) percents be used?
+#' @param pvalcol Should a column be included for p-values? TRUE (default) or FALSE. 
+#' @keywords summary table lisa
+#' @importFrom doBy summaryBy
+#' @importFrom xtable xtable
+#' @import Hmisc 
+#' @importFrom MASS polr
 #' @export 
 nicetable <- function(df,
                       covs,
@@ -44,7 +50,7 @@ nicetable <- function(df,
                        warnmissby = FALSE,
                        orderfreq = FALSE,
                        labels = NA,
-                       stats = "mean_sd_median_range",
+                       stats = "mean_sd",
                        statlabs = TRUE,
                        tests = NA,
                        percent = 2,
@@ -60,10 +66,10 @@ nicetable <- function(df,
                        paired = FALSE){
     
     ### load packages
-    require(doBy)
-    require(Hmisc)
-    require(xtable)
-    require(MASS)
+#     require(doBy)
+#     require(Hmisc)
+#     require(xtable)
+#     require(MASS)
     
     if (is.na(by)){
         df$Allcol <- "ALL"
@@ -186,7 +192,7 @@ nicetable <- function(df,
         labels[stats == "median_range"] <- paste(labels[stats == "median_range"], ", Median [Min, Max]", sep="")
         labels[stats == "mean_median_range"] <- paste(labels[stats == "mean_median_range"], ", Mean, Median [Min, Max]", sep="")
         labels[stats == "mean_sd_range"] <- paste(labels[stats == "mean_sd_range"], ", Mean (SD) [Min, Max]", sep="")
-#         labels[stats == "mean_sd_median_range"] <- paste(labels[stats == "mean_sd_median_range"], ", Mean (SD), Median [Min, Max]", sep="")
+        labels[stats == "mean_sd_median_range"] <- paste(labels[stats == "mean_sd_median_range"], ", Mean (SD), Median [Min, Max]", sep="")
     }
     
     ### if tests is blank do not calculate a p-value
@@ -371,21 +377,11 @@ nicetable <- function(df,
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 1)
-                if (stats[k] == "mean_sd_median_range"){
-                    tmp <- matrix(data = NA, 
-                                  ncol = nlevels(df[,by]) + 4, 
-                                  nrow = 3)
-                }
             }
             if (missing == TRUE & (dispmiss == TRUE | dispN == TRUE)){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 2)
-                if (stats[k] == "mean_sd_median_range"){
-                    tmp <- matrix(data = NA, 
-                                  ncol = nlevels(df[,by]) + 4, 
-                                  nrow = 4)
-                }
             }
             
             tmp[1,1] <- paste(labels[k], sep=" ") 
@@ -433,20 +429,11 @@ nicetable <- function(df,
                                            FUN = mean_sd_range)[,2])
             }
             if (stats[k] == "mean_sd_median_range"){
-                tmp[2,1] <- "* Mean (SD)"
-                tmp[2,2] <- mean_sd(df[,covs[k]])
-                tmp[2, 3:(2+nlevels(df[,by]))] <- 
+                tmp[1,2] <- mean_sd_median_range(df[,covs[k]])
+                tmp[1, 3:(2+nlevels(df[,by]))] <- 
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
-                                           FUN = mean_sd)[,2])
-                
-                tmp[3,1] <- "* Median [Min, Max]"
-                tmp[3,2] <- median_range(df[,covs[k]])
-                tmp[3, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = median_range)[,2])
-                
+                                           FUN = mean_sd_median_range)[,2])
             }
             
             if (pval[k] == TRUE){

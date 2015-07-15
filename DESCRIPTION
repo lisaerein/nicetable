@@ -1,9 +1,18 @@
 Package: nicetable
-Title: What the package does (one line)
+Title: This function creates a nice looking summary table.
 Version: 0.1
-Authors@R: "First Last <first.last@example.com> [aut, cre]"
-Description: What the package does (one paragraph)
-Depends:
+Authors@R: "Lisa Rein <lisaerein@gmail.com> [aut, cre]"
+Description: This function creates a nice looking summary table similar to the
+    Mayo clinic SAS table macro. The function returns a dataframe. The function
+    also prints an html table by default for use in R markdown documents.
+Depends: 
     R (>= 3.1.0)
-License: What license is it under?
+Imports: 
+    doBy,
+    Hmisc,
+    MASS,
+    xtable
+License: CC0
 LazyData: true
+Suggests: knitr
+VignetteBuilder: knitr
