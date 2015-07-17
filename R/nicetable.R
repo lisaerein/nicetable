@@ -15,7 +15,7 @@
 #' If only one is listed, the type will be repeated for each covariate.
 #' @param orderfreq If TRUE, categorical variables will be ordered by descending frequency. Default = FALSE.
 #' @param labels Labels for covariates. Default = NA in which case variable names will be used.
-#' @param stats Statistics to display for continuous variables (mean_sd (default), mean_sem, median_range, or median_iqr). 
+#' @param stats Statistics to display for continuous variables (mean_sd_median_range (default), mean_sd, mean_sem, median_range, or median_iqr). 
 #' Can be a vector or length one to apply to all continuous variables.
 #' @param statlabs If TRUE, continuous variable labels will include description of summary statistics. Default = FALSE.
 #' @param tests Vector of tests to calculate p-values. If only one is entered it will apply to all covs. 
@@ -50,7 +50,7 @@ nicetable <- function(df,
                        warnmissby = FALSE,
                        orderfreq = FALSE,
                        labels = NA,
-                       stats = "mean_sd",
+                       stats = "mean_sd_median_range",
                        statlabs = TRUE,
                        tests = NA,
                        percent = 2,
@@ -192,7 +192,7 @@ nicetable <- function(df,
         labels[stats == "median_range"] <- paste(labels[stats == "median_range"], ", Median [Min, Max]", sep="")
         labels[stats == "mean_median_range"] <- paste(labels[stats == "mean_median_range"], ", Mean, Median [Min, Max]", sep="")
         labels[stats == "mean_sd_range"] <- paste(labels[stats == "mean_sd_range"], ", Mean (SD) [Min, Max]", sep="")
-        labels[stats == "mean_sd_median_range"] <- paste(labels[stats == "mean_sd_median_range"], ", Mean (SD), Median [Min, Max]", sep="")
+        labels[stats == "mean_sd_median_range"] <- paste(labels[stats == "mean_sd_median_range"], sep="")
     }
     
     ### if tests is blank do not calculate a p-value
@@ -377,11 +377,21 @@ nicetable <- function(df,
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 1)
+                if (stats[k] == "mean_sd_median_range"){
+                    tmp <- matrix(data = NA, 
+                                  ncol = nlevels(df[,by]) + 4, 
+                                  nrow = 3)
+                }
             }
             if (missing == TRUE & (dispmiss == TRUE | dispN == TRUE)){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 2)
+                if (stats[k] == "mean_sd_median_range"){
+                    tmp <- matrix(data = NA, 
+                                  ncol = nlevels(df[,by]) + 4, 
+                                  nrow = 4)
+                }
             }
             
             tmp[1,1] <- paste(labels[k], sep=" ") 
@@ -429,11 +439,18 @@ nicetable <- function(df,
                                            FUN = mean_sd_range)[,2])
             }
             if (stats[k] == "mean_sd_median_range"){
-                tmp[1,2] <- mean_sd_median_range(df[,covs[k]])
-                tmp[1, 3:(2+nlevels(df[,by]))] <- 
+                tmp[2,2] <- mean_sd(df[,covs[k]])
+                tmp[3,2] <- median_range(df[,covs[k]])
+                tmp[2, 3:(2+nlevels(df[,by]))] <- 
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
-                                           FUN = mean_sd_median_range)[,2])
+                                           FUN = mean_sd)[,2])
+                tmp[3, 3:(2+nlevels(df[,by]))] <- 
+                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
+                                           data = df,
+                                           FUN = median_range)[,2])
+                tmp[2,1] <- "Mean (SD)"
+                tmp[3,1] <- "Median [Range]"
             }
             
             if (pval[k] == TRUE){
