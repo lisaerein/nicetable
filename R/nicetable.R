@@ -455,7 +455,7 @@ nicetable <- function(df,
                                            data = df,
                                            FUN = median_range)[,2])
                 tmp[2,1] <- "* Mean (SD)"
-                tmp[3,1] <- "* Median [Range]"
+                tmp[3,1] <- "* Median [Min, Max]"
             }
             
             if (pval[k] == TRUE){
