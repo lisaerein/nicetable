@@ -644,12 +644,10 @@ nicetable <- function(df,
                                                 final_table[head,"Variable"],
                                                 "<b/>", sep="")
         ### create htmlTable
-            htmlver <- htmlTable(x = final_table[,2:ncol(final_table)],
+            return(htmlTable(x = final_table[,2:ncol(final_table)],
                       rnames = final_table[,"Variable"],
                       css.cell='padding-left: 2em; padding-right: 2em;',
-                      col.rgroup=rgroup)
-        
-        return(htmlver)
+                      col.rgroup=rgroup))
     } 
    
 }
