@@ -11,7 +11,8 @@ Imports:
     doBy,
     Hmisc,
     MASS,
-    xtable
+    xtable,
+	htmlTable
 License: CC0
 LazyData: true
 Suggests: knitr

@@ -42,35 +42,40 @@
 #' @importFrom xtable xtable
 #' @import Hmisc 
 #' @importFrom MASS polr
+#' @importFrom htmlTable htmlTable
 #' @export 
 nicetable <- function(df,
                       covs,
                       type, 
                       by = NA,
-                       warnmissby = FALSE,
-                       orderfreq = FALSE,
-                       labels = NA,
-                       stats = "mean_sd_median_range",
-                       statlabs = TRUE,
-                       tests = NA,
-                       percent = 2,
-                       perc.dec = 1,
-                       cont.dec = 2,
-                       pval.dec = 3,
-                       allcol = TRUE,
-                       testcol = TRUE,
-                       pvalcol = TRUE,
-		               dispmiss = FALSE,
-                       dispN = FALSE,
-                       printRMD = TRUE,
-                       paired = FALSE){
-    
-    ### load packages
+                      warnmissby = FALSE,
+                      orderfreq = FALSE,
+                      labels = NA,
+                      stats = "mean_sd_median_range",
+                      statlabs = TRUE,
+                      tests = NA,
+                      percent = 2,
+                      perc.dec = 1,
+                      cont.dec = 2,
+                      pval.dec = 3,
+                      allcol = TRUE,
+                      testcol = TRUE,
+                      pvalcol = TRUE,
+		              dispmiss = FALSE,
+                      dispN = FALSE,
+                      printRMD = TRUE,
+                      paired = FALSE,
+                      blanks = TRUE,
+                      htmlTable = FALSE,
+                      color = "#EEEEEE"){
+
+#     ### load packages
 #     require(doBy)
 #     require(Hmisc)
 #     require(xtable)
 #     require(MASS)
-    
+#     require(htmlTable)
+ 
     if (is.na(by)){
         df$Allcol <- "ALL"
         by <- "Allcol"
@@ -102,26 +107,19 @@ nicetable <- function(df,
               sprintf(contf, round(   max(x, na.rm=TRUE),cont.dec)), "]", sep="")
     }
     
-    mean_median_range <- function(x){
-        paste(sprintf(contf, round(mean(x, na.rm=TRUE), cont.dec)), ", ",
-              sprintf(contf, round(median(x, na.rm=TRUE),cont.dec)), " [", 
-              sprintf(contf, round(   min(x, na.rm=TRUE),cont.dec)), ", ", 
-              sprintf(contf, round(   max(x, na.rm=TRUE),cont.dec)), "]", sep="")
-    }
-    
-    mean_sd_range <- function(x){
-        paste(sprintf(contf, round(mean(x, na.rm=TRUE), cont.dec)), " (",
-              sprintf(contf, round(  sd(x, na.rm=TRUE),cont.dec)), ") [", 
-              sprintf(contf, round( min(x, na.rm=TRUE),cont.dec)), ", ", 
-              sprintf(contf, round( max(x, na.rm=TRUE),cont.dec)), "]", sep="")
-    }
-    
     mean_sd_median_range <- function(x){
         paste(sprintf(contf, round(  mean(x, na.rm=TRUE), cont.dec)), " (",
               sprintf(contf, round(    sd(x, na.rm=TRUE), cont.dec)), "), ",
               sprintf(contf, round(median(x, na.rm=TRUE),cont.dec)), " [", 
               sprintf(contf, round(   min(x, na.rm=TRUE),cont.dec)), ", ", 
               sprintf(contf, round(   max(x, na.rm=TRUE),cont.dec)), "]", sep="")
+    }
+    
+    mean_sd_median_iqr <- function(x){
+        paste(sprintf(contf, round(  mean(x, na.rm=TRUE), cont.dec)), " (",
+              sprintf(contf, round(    sd(x, na.rm=TRUE), cont.dec)), "), ",
+              sprintf(contf, round(median(x, na.rm=TRUE),cont.dec)) , " (", 
+              sprintf(contf, round(   IQR(x, na.rm=TRUE),cont.dec)), ")", sep="")
     }
     
     sem <- function(x) sqrt(var(x,na.rm=TRUE)/length(na.omit(x)))
@@ -185,15 +183,15 @@ nicetable <- function(df,
     labels[is.na(labels)] <- covs[is.na(labels)]
     
     ## if statlabs is TRUE add a note about which summary stats are displayed
-    if (statlabs == TRUE){
-        labels[stats == "mean_sd"] <- paste(labels[stats == "mean_sd"], ", Mean (SD)", sep="")
-        labels[stats == "mean_sem"] <- paste(labels[stats == "mean_sem"], ", Mean (SEM)", sep="")
-        labels[stats == "median_iqr"] <- paste(labels[stats == "median_iqr"], ", Median (IQR)", sep="")
-        labels[stats == "median_range"] <- paste(labels[stats == "median_range"], ", Median [Min, Max]", sep="")
-        labels[stats == "mean_median_range"] <- paste(labels[stats == "mean_median_range"], ", Mean, Median [Min, Max]", sep="")
-        labels[stats == "mean_sd_range"] <- paste(labels[stats == "mean_sd_range"], ", Mean (SD) [Min, Max]", sep="")
-        labels[stats == "mean_sd_median_range"] <- paste(labels[stats == "mean_sd_median_range"], sep="")
-    }
+#     if (statlabs == TRUE){
+#         labels[stats == "mean_sd"] <- paste(labels[stats == "mean_sd"], ", Mean (SD)", sep="")
+#         labels[stats == "mean_sem"] <- paste(labels[stats == "mean_sem"], ", Mean (SEM)", sep="")
+#         labels[stats == "median_iqr"] <- paste(labels[stats == "median_iqr"], ", Median (IQR)", sep="")
+#         labels[stats == "median_range"] <- paste(labels[stats == "median_range"], ", Median [Min, Max]", sep="")
+#         labels[stats == "mean_median_range"] <- paste(labels[stats == "mean_median_range"], ", Mean, Median [Min, Max]", sep="")
+#         labels[stats == "mean_sd_range"] <- paste(labels[stats == "mean_sd_range"], ", Mean (SD) [Min, Max]", sep="")
+#         labels[stats == "mean_sd_median_range"] <- paste(labels[stats == "mean_sd_median_range"], sep="")
+#     }
     
     ### if tests is blank do not calculate a p-value
     if (length(tests) == 1){
@@ -212,6 +210,10 @@ nicetable <- function(df,
         }
     }
     df <- df[!is.na(df[,by]),]
+
+
+    ## save color x number of rows per variable
+    rgroup <- NULL
     
     sum_table <- NULL
     
@@ -359,9 +361,12 @@ nicetable <- function(df,
                     table(is.na(df[,covs[k]]), df[,by])["TRUE",]
             }
             
-            blank <- rep(NA, ncol(tmp))
-            
-            sum_table <- rbind(sum_table, blank, tmp)
+            if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp))) 
+            if (k %% 2 != 0) rgroup <- c(rgroup, rep(color, nrow(tmp)))
+            if (blanks == TRUE){
+                blank <- rep(NA, ncol(tmp))
+                sum_table <- rbind(sum_table, blank, tmp)
+            }
             
         }
         
@@ -381,8 +386,8 @@ nicetable <- function(df,
             if (missing == FALSE | (missing == TRUE & dispmiss == FALSE & dispN == FALSE)){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
-                              nrow = 1)
-                if (stats[k] == "mean_sd_median_range"){
+                              nrow = 2)
+                if (stats[k] == "mean_sd_median_range" | stats[k] == "mean_sd_median_iqr"){
                     tmp <- matrix(data = NA, 
                                   ncol = nlevels(df[,by]) + 4, 
                                   nrow = 3)
@@ -391,8 +396,8 @@ nicetable <- function(df,
             if (missing == TRUE & (dispmiss == TRUE | dispN == TRUE)){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
-                              nrow = 2)
-                if (stats[k] == "mean_sd_median_range"){
+                              nrow = 3)
+                if (stats[k] == "mean_sd_median_range" | stats[k] == "mean_sd_median_iqr"){
                     tmp <- matrix(data = NA, 
                                   ncol = nlevels(df[,by]) + 4, 
                                   nrow = 4)
@@ -402,47 +407,37 @@ nicetable <- function(df,
             tmp[1,1] <- paste(labels[k], sep=" ") 
             
             if (stats[k] == "mean_sd"){
-                tmp[1,2] <- mean_sd(df[,covs[k]])
-                tmp[1, 3:(2+nlevels(df[,by]))] <- 
+                tmp[2, 2] <- mean_sd(df[,covs[k]])
+                tmp[2, 3:(2+nlevels(df[,by]))] <- 
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
                                            FUN = mean_sd)[,2])
+                tmp[2,1] <- "* Mean (SD)"
             } 
             if (stats[k] == "mean_sem"){
-                tmp[1,2] <- mean_sem(df[,covs[k]])
+                tmp[2, 2] <- mean_sem(df[,covs[k]])
                 tmp[1, 3:(2+nlevels(df[,by]))] <- 
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
                                            FUN = mean_sem)[,2])
+                tmp[2,1] <- "* Mean (SEM)"
             } 
             if (stats[k] == "median_iqr"){
-                tmp[1,2] <- median_iqr(df[,covs[k]])
-                tmp[1, 3:(2+nlevels(df[,by]))] <- 
+                tmp[2, 2] <- median_iqr(df[,covs[k]])
+                tmp[2, 3:(2+nlevels(df[,by]))] <- 
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
                                            FUN = median_iqr)[,2])
+                tmp[2,1] <- "* Median (IQR)"
             } 
             if (stats[k] == "median_range"){
-                tmp[1,2] <- median_range(df[,covs[k]])
-                tmp[1, 3:(2+nlevels(df[,by]))] <- 
+                tmp[2, 2] <- median_range(df[,covs[k]])
+                tmp[3, 3:(2+nlevels(df[,by]))] <- 
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
                                            FUN = median_range)[,2])
+                tmp[2,1] <- "* Mean [Min, Max]"
             } 
-            if (stats[k] == "mean_median_range"){
-                tmp[1,2] <- mean_median_range(df[,covs[k]])
-                tmp[1, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = mean_median_range)[,2])
-            }
-            if (stats[k] == "mean_sd_range"){
-                tmp[1,2] <- mean_sd_range(df[,covs[k]])
-                tmp[1, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = mean_sd_range)[,2])
-            }
             if (stats[k] == "mean_sd_median_range"){
                 tmp[2,2] <- mean_sd(df[,covs[k]])
                 tmp[3,2] <- median_range(df[,covs[k]])
@@ -456,6 +451,20 @@ nicetable <- function(df,
                                            FUN = median_range)[,2])
                 tmp[2,1] <- "* Mean (SD)"
                 tmp[3,1] <- "* Median [Min, Max]"
+            }
+            if (stats[k] == "mean_sd_median_iqr"){
+                tmp[2,2] <- mean_sd(df[,covs[k]])
+                tmp[3,2] <- median_iqr(df[,covs[k]])
+                tmp[2, 3:(2+nlevels(df[,by]))] <- 
+                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
+                                           data = df,
+                                           FUN = mean_sd)[,2])
+                tmp[3, 3:(2+nlevels(df[,by]))] <- 
+                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
+                                           data = df,
+                                           FUN = median_iqr)[,2])
+                tmp[2,1] <- "* Mean (SD)"
+                tmp[3,1] <- "* Median (IQR)"
             }
             
             if (pval[k] == TRUE){
@@ -582,10 +591,14 @@ nicetable <- function(df,
                 tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
                     table(is.na(df[,covs[k]]), df[,by])["TRUE",]
             }
-
-            blank <- rep(NA, ncol(tmp))
             
-            sum_table <- rbind(sum_table, blank, tmp)
+            if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp))) 
+            if (k %% 2 != 0) rgroup <- c(rgroup, rep(color, nrow(tmp))) 
+            if (blanks == TRUE){
+                blank <- rep(NA, ncol(tmp))
+                sum_table <- rbind(sum_table, blank, tmp)
+            }
+            
         }
     }
     
@@ -605,10 +618,38 @@ nicetable <- function(df,
     if (allcol != TRUE){
         final_table <- final_table[,c(1,3:ncol(final_table))]
     } 
+
     if (printRMD == TRUE){
         print(xtable(final_table), type='html', include.rownames=F)
+        
+        return(final_table)
     }
-    
-    return(final_table)
+
+    if (htmlTable == TRUE){
+        ### stop htmlTable from treating everything as a factor
+        for (i in 1:ncol(final_table)){
+            final_table[,i] <- as.character(final_table[,i])
+        }
+        ### remove blanks 
+            final_table <- final_table[!is.na(final_table[,1]),]
+        ### get header rows
+            head <- which(is.na(final_table[,2]))
+        ### get non-header rows
+            nohead <- which(!is.na(final_table[,2]))
+        ### indent non-header rows and remove *
+            final_table[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
+                                                    substring(final_table[nohead,"Variable"], 3))
+         ### bold header rows   
+            final_table[head,"Variable"] <- paste("<b>",
+                                                final_table[head,"Variable"],
+                                                "<b/>", sep="")
+        ### create htmlTable
+            htmlver <- htmlTable(x = final_table[,2:ncol(final_table)],
+                      rnames = final_table[,"Variable"],
+                      css.cell='padding-left: 2em; padding-right: 2em;',
+                      col.rgroup=rgroup)
+        
+        return(htmlver)
+    } 
    
 }
