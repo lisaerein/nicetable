@@ -4,10 +4,11 @@
 \title{Lisa's Summary Table Function}
 \usage{
 nicetable(df, covs, type, by = NA, warnmissby = FALSE, orderfreq = FALSE,
-  labels = NA, stats = "mean_sd", statlabs = TRUE, tests = NA,
-  percent = 2, perc.dec = 1, cont.dec = 2, pval.dec = 3,
+  labels = NA, stats = "mean_sd_median_range", statlabs = TRUE,
+  tests = NA, percent = 2, perc.dec = 1, cont.dec = 2, pval.dec = 3,
   allcol = TRUE, testcol = TRUE, pvalcol = TRUE, dispmiss = FALSE,
-  dispN = FALSE, printRMD = TRUE, paired = FALSE)
+  dispN = FALSE, printRMD = TRUE, paired = FALSE, blanks = TRUE,
+  htmlTable = FALSE, color = "#EEEEEE")
 }
 \arguments{
 \item{df}{Dataframe object name (REQUIRED).}
@@ -28,7 +29,7 @@ If only one is listed, the type will be repeated for each covariate.}
 
 \item{labels}{Labels for covariates. Default = NA in which case variable names will be used.}
 
-\item{stats}{Statistics to display for continuous variables (mean_sd (default), mean_sem, median_range, or median_iqr).
+\item{stats}{Statistics to display for continuous variables (mean_sd_median_range (default), mean_sd, mean_sem, median_range, or median_iqr).
 Can be a vector or length one to apply to all continuous variables.}
 
 \item{statlabs}{If TRUE, continuous variable labels will include description of summary statistics. Default = FALSE.}
@@ -63,12 +64,19 @@ dispN will overwrite dispmiss if both are TRUE.}
 \item{printRMD}{Whether to print resulting table to Rmd via xtable. Default = TRUE.}
 
 \item{paired}{Whether test should be paired (TRUE) or unpaired (FALSE = default). Only available for ttest and ranksum.}
+
+\item{blanks}{Should blank rows be used as variable separators? Default = TRUE.}
+
+\item{htmlTable}{Whether to use htmlTable package to display table (instead of xtable). Default = FALSE.}
+
+\item{color}{Hex color to use for htmlTable output. Default = "#EEEEEE" (grey).}
 }
 \description{
 This function creates a nice looking summary table similar
 to the Mayo clinic SAS table macro. The function returns a dataframe.
 The function also prints an html table by default for use in R markdown documents.
 }
+\keyword{lisa}
 \keyword{summary}
 \keyword{table}
 
