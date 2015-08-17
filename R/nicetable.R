@@ -654,7 +654,7 @@ nicetable <- function(df,
             if (!is.na(by)){
                 htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
                                      rnames = final_html[,"Variable"],
-                                     css.cell='padding-left: 2em; padding-right: 2em;',
+                                     css.cell='border-collapse: collapse; padding: 4px;',
                                      col.rgroup=rgroup)
                 print(htmlver)
                 return(final_table)
@@ -665,7 +665,7 @@ nicetable <- function(df,
                                                  ncol = 1),
                                       header = "All",
                                       rnames = final_html[,"Variable"],
-                                      #css.cell='padding-left: 2em; padding-right: 2em;',
+                                      css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
                  print(htmlver)
                  return(final_table)
