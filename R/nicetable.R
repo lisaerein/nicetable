@@ -665,7 +665,7 @@ nicetable <- function(df,
                                                  ncol = 1),
                                       header = "All",
                                       rnames = final_html[,"Variable"],
-                                      css.cell='padding-left: 0em; padding-right: 0em;',
+                                      #css.cell='padding-left: 2em; padding-right: 2em;',
                                       col.rgroup=rgroup)
                  print(htmlver)
                  return(final_table)
