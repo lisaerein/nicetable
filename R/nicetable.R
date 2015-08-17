@@ -35,6 +35,9 @@
 #' @param dispN Whether to display number non-missing for continuous variables. Default = FALSE. 
 #' dispN will overwrite dispmiss if both are TRUE.
 #' @param printRMD Whether to print resulting table to Rmd via xtable. Default = TRUE.
+#' @param htmlTable Whether to use htmlTable package to display table (instead of xtable). Default = FALSE.
+#' @param color Hex color to use for htmlTable output. Default = "#EEEEEE" (grey).
+#' @param blanks Should blank rows be used as variable separators? Default = TRUE.
 #' @param percent Should row (1) or column (2, default) percents be used?
 #' @param pvalcol Should a column be included for p-values? TRUE (default) or FALSE. 
 #' @keywords summary table lisa
@@ -626,31 +629,47 @@ nicetable <- function(df,
     }
 
     if (htmlTable == TRUE){
+        
+        final_html <- final_table
+        
         ### stop htmlTable from treating everything as a factor
-        for (i in 1:ncol(final_table)){
-            final_table[,i] <- as.character(final_table[,i])
+        for (i in 1:ncol(final_html)){
+            final_html[,i] <- as.character(final_html[,i])
         }
         ### remove blanks 
-            final_table <- final_table[!is.na(final_table[,1]),]
+            final_html <- final_html[!is.na(final_html[,1]),]
         ### get header rows
-            head <- which(is.na(final_table[,2]))
+            head <- which(is.na(final_html[,2]))
         ### get non-header rows
-            nohead <- which(!is.na(final_table[,2]))
+            nohead <- which(!is.na(final_html[,2]))
         ### indent non-header rows and remove *
-            final_table[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
-                                                    substring(final_table[nohead,"Variable"], 3))
-         ### bold header rows   
-            final_table[head,"Variable"] <- paste("<b>",
-                                                final_table[head,"Variable"],
+            final_html[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
+                                                    substring(final_html[nohead,"Variable"], 3))
+        ### bold header rows   
+            final_html[head,"Variable"] <- paste("<b>",
+                                                final_html[head,"Variable"],
                                                 "<b/>", sep="")
+                
         ### create htmlTable
-            htmlver <- htmlTable(x = final_table[,2:ncol(final_table)],
-                                 rnames = final_table[,"Variable"],
-                                 css.cell='padding-left: 2em; padding-right: 2em;',
-                                 col.rgroup=rgroup)
-        
-        print(htmlver)
-        return(htmlver)
+            if (!is.na(by)){
+                htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
+                                     rnames = final_html[,"Variable"],
+                                     css.cell='padding-left: 2em; padding-right: 2em;',
+                                     col.rgroup=rgroup)
+                print(htmlver)
+                return(final_table)
+            }
+            if (is.na(by)){
+                 htmlver <- htmlTable(x = matrix(final_html[,2:ncol(final_html)],
+                                                 nrow = nrow(final_html), 
+                                                 ncol = 1),
+                                      header = "All",
+                                      rnames = final_html[,"Variable"],
+                                      css.cell='padding-left: 0em; padding-right: 0em;',
+                                      col.rgroup=rgroup)
+                 print(htmlver)
+                 return(final_table)
+            }   
     } 
    
 }
