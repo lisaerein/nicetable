@@ -78,9 +78,12 @@ nicetable <- function(df,
 #     require(xtable)
 #     require(MASS)
 #     require(htmlTable)
+    
+    noby <- 0
+    noby[is.na(by)] <- 1
  
     if (is.na(by)){
-        df$Allcol <- "ALL"
+        df$Allcol <- "All"
         by <- "Allcol"
         allcol <- FALSE
     }
@@ -613,10 +616,10 @@ nicetable <- function(df,
                             "p-value",
                             "Test")
     if (pvalcol != TRUE | sum(!is.na(tests)) == 0){
-        final_table <- final_table[,1:(ncol(final_table)-2)]
+        final_table <- final_table[,which(names(final_table) %in% c("p-value", "Test") == FALSE)]
     }
     if (testcol != TRUE & pvalcol == TRUE){
-        final_table <- final_table[,1:(ncol(final_table)-1)]
+        final_table <- final_table[,which(names(final_table) != "Test")]
     }
     if (allcol != TRUE){
         final_table <- final_table[,c(1,3:ncol(final_table))]
@@ -651,7 +654,7 @@ nicetable <- function(df,
                                                 "<b/>", sep="")
                 
         ### create htmlTable
-            if (!is.na(by)){
+            if (noby == 0){
                 htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
                                      rnames = final_html[,"Variable"],
                                      css.cell='border-collapse: collapse; padding: 4px;',
@@ -659,11 +662,17 @@ nicetable <- function(df,
                 print(htmlver)
                 return(final_table)
             }
-            if (is.na(by)){
-                 htmlver <- htmlTable(x = matrix(final_html[,2:ncol(final_html)],
-                                                 nrow = nrow(final_html), 
-                                                 ncol = 1),
-                                      header = "All",
+                    
+            if (noby == 1){
+                
+                for (i in 1:ncol(final_html)){
+                    final_html[,i] <- as.character(final_html[,i])
+                }
+                
+                data <- data.frame(final_html[,2])
+                names(data) <- paste("All (n = ", nrow(df), ")", sep="")
+                
+                 htmlver <- htmlTable(x = data,
                                       rnames = final_html[,"Variable"],
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
