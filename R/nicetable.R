@@ -424,7 +424,7 @@ nicetable <- function(df,
             } 
             if (stats[k] == "mean_sem"){
                 tmp[2, 2] <- mean_sem(df[,covs[k]])
-                tmp[1, 3:(2+nlevels(df[,by]))] <- 
+                tmp[2, 3:(2+nlevels(df[,by]))] <- 
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
                                            FUN = mean_sem)[,2])
@@ -440,7 +440,7 @@ nicetable <- function(df,
             } 
             if (stats[k] == "median_range"){
                 tmp[2, 2] <- median_range(df[,covs[k]])
-                tmp[3, 3:(2+nlevels(df[,by]))] <- 
+                tmp[2, 3:(2+nlevels(df[,by]))] <- 
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
                                            FUN = median_range)[,2])
