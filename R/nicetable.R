@@ -444,7 +444,7 @@ nicetable <- function(df,
                     as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                            data = df,
                                            FUN = median_range)[,2])
-                tmp[2,1] <- "* Mean [Min, Max]"
+                tmp[2,1] <- "* Median [Min, Max]"
             } 
             if (stats[k] == "mean_sd_median_range"){
                 tmp[2,2] <- mean_sd(df[,covs[k]])

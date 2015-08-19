@@ -1,0 +1,83 @@
+---
+title: "nicetable Vignette"
+author: "Lisa Rein"
+date: "Wednesday, August 19, 2015"
+output: html_document
+---
+
+```{r load_package}
+
+library(devtools)
+install_github("lisaerein/nicetable")
+library(nicetable)
+
+library(datasets)
+iris <- iris
+iris$color <- sample(c("white", "pink", "red"), nrow(iris), replace = T)
+
+```
+
+### Basic single group summary table
+```{r, results = 'asis'}
+
+table1 <- nicetable(df = iris,
+                    covs = names(iris),
+                    type = c(1,1,1,1,2,2))
+
+```
+
+#### change number of decimal places
+```{r, results = 'asis'}
+table1 <- nicetable(df = iris,
+                    covs = names(iris),
+                    type = c(1,1,1,1,2,2),
+                    cont.dec = 1,
+                    perc.dec = 2)
+```
+
+#### change summary statistics for continuous variables & add missing frequency
+```{r, results = 'asis'}
+table1 <- nicetable(df = iris,
+                    covs = names(iris),
+                    type = c(1,1,1,1,2,2),
+                    stats = "median_range")
+```
+
+#### change variable labels
+```{r, results = 'asis'}
+table1 <- nicetable(df = iris,
+                    covs = names(iris),
+                    type = c(1,1,1,1,2,2),
+                    labels = c("Sepal Length",
+                               "Sepal Width",
+                               "Petal Length",
+                               "Petal Width",
+                               "Flower Species",
+                               "Color"))
+```
+
+#### change look of the table using htmlTable
+```{r, results = 'asis'}
+
+table1 <- nicetable(df = iris,
+                    covs = names(iris),
+                    type = c(1,1,1,1,2,2),
+                    htmlTable = TRUE)
+```
+
+Stratified summary table
+
+```{r, results = 'asis'}
+
+table1 <- nicetable(df = iris,
+                    covs = c(),
+                    by = "Species",
+                    type = c(1,1,1,1))
+
+table1 <- nicetable(df = iris,
+                    covs = names(iris)[1:4],
+                    by = "Species",
+                    type = c(1,1,1,1),
+                    htmlTable = TRUE)
+
+```
