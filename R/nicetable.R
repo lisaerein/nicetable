@@ -79,6 +79,8 @@ nicetable <- function(df,
 #     require(MASS)
 #     require(htmlTable)
     
+    if (htmlTable == TRUE) printRMD = FALSE
+    
     noby <- 0
     noby[is.na(by)] <- 1
  
