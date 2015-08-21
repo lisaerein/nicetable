@@ -679,7 +679,9 @@ nicetable <- function(df,
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
                  print(htmlver)
-                 return(final_table)
+                
+                names(final_table)[2] <- paste("All (n = ", nrow(df), ")", sep="")
+                return(final_table)
             }   
     } 
    
