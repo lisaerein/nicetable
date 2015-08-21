@@ -85,7 +85,7 @@ nicetable <- function(df,
     noby[is.na(by)] <- 1
  
     if (is.na(by)){
-        df$Allcol <- "All"
+        df$Allcol <- "ALL"
         by <- "Allcol"
         allcol <- FALSE
     }
