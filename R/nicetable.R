@@ -6,7 +6,7 @@
 #' The function also prints an html table by default for use in R markdown documents.
 #' @param df Dataframe object name (REQUIRED).
 #' @param covs Vector of covariates to include in table (REQUIRED).
-#' @param type Vector indicating type of each covariates (REQUIRED). 
+#' @param type Vector indicating type of each covariate - use 1 for continuous and 2 for categorical (REQUIRED). 
 #' @param by Variable to stratify by. Defaults to NA (no stratifying variable). No tests will be done.
 #' @param warnmissby Whether to warn user that there are missing by variable values. Missing values will be excluded. 
 #' Default = FALSE.
@@ -24,7 +24,7 @@
 #' Non-Parametric ("np": ranksum, Fisher's exact, kruskal-wallis), 
 #' T-test ("ttest"), Chi-Squared ("chisq"), 
 #' Kruskal-Wallis ("kw"), Mann-Whitney Rank Sum ("ranksum"), Anova ("anova"), 
-#' Fisher's Exact test ("fe") are curretly supported.
+#' Fisher's Exact test ("fe") are currently supported.
 #' @param paired Whether test should be paired (TRUE) or unpaired (FALSE = default). Only available for ttest and ranksum.
 #' @param perc.dec Number of decimals for percentages (categorcal variables). Default = 1.
 #' @param cont.dec Number of decimals for continuous variable summary stats (mean, median, sd, iqr). Default = 2.
