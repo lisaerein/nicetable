@@ -8,11 +8,7 @@
 #' @param covs Vector of covariates to include in table (REQUIRED).
 #' @param type Vector indicating type of each covariate - use 1 for continuous and 2 for categorical (REQUIRED). 
 #' @param by Variable to stratify by. Defaults to NA (no stratifying variable). No tests will be done.
-#' @param warnmissby Whether to warn user that there are missing by variable values. Missing values will be excluded. 
-#' Default = FALSE.
-#' 1 = continuous, 2 = categorical, 
-#' 3 = ordinal (factor levels must be set in ascending order prior to running). 
-#' If only one is listed, the type will be repeated for each covariate.
+#' @param warnmissby Whether to warn user that there are missing by variable values. Missing values will be excluded. Default = FALSE.
 #' @param orderfreq If TRUE, categorical variables will be ordered by descending frequency. Default = FALSE.
 #' @param labels Labels for covariates. Default = NA in which case variable names will be used.
 #' @param stats Statistics to display for continuous variables (mean_sd_median_range (default), mean_sd, mean_sem, median_range, or median_iqr). 
