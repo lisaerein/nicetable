@@ -9,7 +9,7 @@
 #' @param type Vector indicating type of each covariate - use 1 for continuous and 2 for categorical (REQUIRED). 
 #' @param by Variable to stratify by. Defaults to NA (no stratifying variable). No tests will be done.
 #' @param warnmissby Whether to warn user that there are missing by variable values. Missing values will be excluded. Default = FALSE.
-#' @param orderfreq If TRUE, categorical variables will be ordered by descending frequency. Default = FALSE.
+#' @param orderfreq If TRUE, all unordered (non-factor) categorical variables will be ordered by descending frequency. Default = FALSE.
 #' @param labels Labels for covariates. Default = NA in which case variable names will be used.
 #' @param stats Statistics to display for continuous variables (mean_sd_median_range (default), mean_sd, mean_sem, median_range, or median_iqr). 
 #' Can be a vector or length one to apply to all continuous variables.
@@ -234,14 +234,16 @@ nicetable <- function(df,
             if (sum(is.na(df[,covs[k]])) > 0) missing <- TRUE
             
             ### treat categorical covariates as factors
-            df[,covs[k]] <- factor(df[,covs[k]])
-            ### if orderfreq = TRUE then reorder factor levels by descending frequency
-            if (orderfreq == TRUE) {
-                tb <- table(df[,covs[k]])
-                df[,covs[k]] <- factor(df[,covs[k]], 
-                                       levels = names(tb[order(tb, decreasing = TRUE)])) 
+            ### if orderfreq = TRUE then reorder all unordered factor levels by descending frequency
+            ### if covariate is already a factor keep the original ordering
+            if (is.factor(df[,covs[k]]) == FALSE){
+                df[,covs[k]] <- factor(df[,covs[k]])
+                if (orderfreq == TRUE) {
+                    tb <- table(df[,covs[k]])
+                    df[,covs[k]] <- factor(df[,covs[k]], 
+                                           levels = names(tb[order(tb, decreasing = TRUE)])) 
+                }
             }
-            
             ### create a mini table for this variable alone
             ### the number of columns is the number of groups 
             ### + 1 names column + 1 pvalue column + 1 test name column
