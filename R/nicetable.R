@@ -624,10 +624,10 @@ nicetable <- function(df,
         final_table <- final_table[,which(names(final_table) != "Test")]
     }
     if (allcol != TRUE){
-        (if byref == TRUE){
+        if (byref == TRUE){
             final_table <- final_table[,c(1,3:ncol(final_table))] 
         }
-        (if byref != TRUE){
+        if (byref != TRUE){
             final_table <- final_table[,c(1,4:ncol(final_table))] 
         }
     }
