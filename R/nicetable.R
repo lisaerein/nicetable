@@ -36,6 +36,7 @@
 #' @param blanks Should blank rows be used as variable separators? Default = TRUE.
 #' @param percent Should row (1) or column (2, default) percents be used?
 #' @param pvalcol Should a column be included for p-values? TRUE (default) or FALSE. 
+#' @param byref Should reference "by" category column be included (default = TRUE)
 #' @keywords summary table lisa
 #' @importFrom doBy summaryBy
 #' @importFrom xtable xtable
@@ -66,7 +67,8 @@ nicetable <- function(df,
                       paired = FALSE,
                       blanks = TRUE,
                       htmlTable = FALSE,
-                      color = "#EEEEEE"){
+                      color = "#EEEEEE",
+		              byref = TRUE){
 
 #     ### load packages
 #     require(doBy)
@@ -622,8 +624,13 @@ nicetable <- function(df,
         final_table <- final_table[,which(names(final_table) != "Test")]
     }
     if (allcol != TRUE){
-        final_table <- final_table[,c(1,3:ncol(final_table))]
-    } 
+        (if byref == TRUE){
+            final_table <- final_table[,c(1,3:ncol(final_table))] 
+        }
+        (if byref != TRUE){
+            final_table <- final_table[,c(1,4:ncol(final_table))] 
+        }
+    }
 
     if (printRMD == TRUE){
         print(xtable(final_table), type='html', include.rownames=F)
