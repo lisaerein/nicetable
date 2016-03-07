@@ -651,6 +651,10 @@ nicetable <- function(df,
         
         return(final_table)
     }
+    
+    if (printRMD == FALSE & htmlTable == FALSE){
+        return(final_table)
+    }
 
     if (htmlTable == TRUE){
         
