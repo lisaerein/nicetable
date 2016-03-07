@@ -77,7 +77,9 @@ nicetable <- function(df,
 #     require(MASS)
 #     require(htmlTable)
     
-    if (is.na(by)) byref = TRUE
+    if (is.na(by)){
+        byref = TRUE
+    } 
     
     if (htmlTable == TRUE) printRMD = FALSE
     
@@ -369,6 +371,13 @@ nicetable <- function(df,
                 tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
                 tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
                     table(is.na(df[,covs[k]]), df[,by])["TRUE",]
+            }
+            
+            if (missing == FALSE & dispmiss == TRUE){
+                lastrow <- rep(NA, ncol(tmp))
+                lastrow[1] <- "* Unknown/Missing"
+                lastrow[2:(nlevels(df[,by])+2)] <- "0"
+                tmp <- rbind(tmp, lastrow)
             }
             
             if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp))) 
