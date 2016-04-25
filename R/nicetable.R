@@ -61,7 +61,7 @@ nicetable <- function(df,
                       allcol = TRUE,
                       testcol = TRUE,
                       pvalcol = TRUE,
-		              dispmiss = FALSE,
+		                  dispmiss = FALSE,
                       dispN = FALSE,
                       printRMD = TRUE,
                       paired = FALSE,
@@ -109,6 +109,12 @@ nicetable <- function(df,
     median_iqr <- function(x){
         paste(sprintf(contf, round(median(x, na.rm=TRUE),cont.dec)), " (", 
               sprintf(contf, round(   IQR(x, na.rm=TRUE),cont.dec)), ")", sep="")
+    }
+    
+    median_q1q3 <- function(x){
+      paste(sprintf(contf, round(  median(x, na.rm=TRUE),              cont.dec)), " [", 
+            sprintf(contf, round(quantile(x, c(0.25), na.rm=T),cont.dec)), ", ", 
+            sprintf(contf, round(quantile(x, c(0.75), na.rm=T),cont.dec)), "]", sep="")
     }
     
     median_range <- function(x){
@@ -406,7 +412,9 @@ nicetable <- function(df,
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 2)
-                if (stats[k] == "mean_sd_median_range" | stats[k] == "mean_sd_median_iqr"){
+                if (stats[k] == "mean_sd_median_range" | 
+                    stats[k] == "mean_sd_median_iqr"   |
+                    stats[k] == "mean_sd_median_q1q3"  ){
                     tmp <- matrix(data = NA, 
                                   ncol = nlevels(df[,by]) + 4, 
                                   nrow = 3)
@@ -416,7 +424,9 @@ nicetable <- function(df,
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 3)
-                if (stats[k] == "mean_sd_median_range" | stats[k] == "mean_sd_median_iqr"){
+                if (stats[k] == "mean_sd_median_range" | 
+                    stats[k] == "mean_sd_median_iqr"   |
+                    stats[k] == "mean_sd_median_q1q3"  ){
                     tmp <- matrix(data = NA, 
                                   ncol = nlevels(df[,by]) + 4, 
                                   nrow = 4)
@@ -484,6 +494,20 @@ nicetable <- function(df,
                                            FUN = median_iqr)[,2])
                 tmp[2,1] <- "* Mean (SD)"
                 tmp[3,1] <- "* Median (IQR)"
+            }
+            if (stats[k] == "mean_sd_median_q1q3"){
+              tmp[2,2] <- mean_sd(df[,covs[k]])
+              tmp[3,2] <- median_iqr(df[,covs[k]])
+              tmp[2, 3:(2+nlevels(df[,by]))] <- 
+                as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
+                                       data = df,
+                                       FUN = mean_sd)[,2])
+              tmp[3, 3:(2+nlevels(df[,by]))] <- 
+                as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
+                                       data = df,
+                                       FUN = median_q1q3)[,2])
+              tmp[2,1] <- "* Mean (SD)"
+              tmp[3,1] <- "* Median [Q1, Q3]"
             }
             
             if (pval[k] == TRUE){
