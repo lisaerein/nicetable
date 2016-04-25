@@ -497,7 +497,7 @@ nicetable <- function(df,
             }
             if (stats[k] == "mean_sd_median_q1q3"){
               tmp[2,2] <- mean_sd(df[,covs[k]])
-              tmp[3,2] <- median_iqr(df[,covs[k]])
+              tmp[3,2] <- median_q1q3(df[,covs[k]])
               tmp[2, 3:(2+nlevels(df[,by]))] <- 
                 as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
                                        data = df,
