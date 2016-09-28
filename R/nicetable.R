@@ -419,7 +419,7 @@ nicetable <- function(df,
             ### the number of columns is the number of groups 
             ### + 1 names column + 1 pvalue column + 1 test name column
             ### the number of rows is 1 for no missing values and 2 if missing values
-            if (missing == FALSE | (missing == TRUE & dispmiss == FALSE & dispN == FALSE)){
+            if (dispmiss == FALSE & dispN == FALSE)){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 2)
@@ -431,7 +431,7 @@ nicetable <- function(df,
                                   nrow = 3)
                 }
             }
-            if (missing == TRUE & (dispmiss == TRUE | dispN == TRUE)){
+            if (dispmiss == TRUE | dispN == TRUE)){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 3)
@@ -655,13 +655,13 @@ nicetable <- function(df,
                     tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
                 }
             }
-            if (missing == TRUE & (dispN == TRUE)){
+            if (dispN == TRUE){
                 tmp[nrow(tmp),1] <- "* N (non-missing)"
                 tmp[nrow(tmp),2] <- sum(!is.na(df[,covs[k]]))
                 tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
                     table(!is.na(df[,covs[k]]), df[,by])["TRUE",]
             }
-            if (missing == TRUE & (dispmiss == TRUE)){
+            if (dispmiss == TRUE){
                 tmp[nrow(tmp),1] <- "* Freq Missing"
                 tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
                 tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
