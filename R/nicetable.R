@@ -71,13 +71,6 @@ nicetable <- function(df,
                       htmlTable = FALSE,
                       color = "#EEEEEE",
 		              byref = TRUE){
-
-#     ### load packages
-#     require(doBy)
-#     require(Hmisc)
-#     require(xtable)
-#     require(MASS)
-#     require(htmlTable)
     
     if (is.na(by)){
         byref = TRUE
@@ -183,33 +176,22 @@ nicetable <- function(df,
     tests[which(tests == "fe"    & type == 1)] <- "ranksum"
     
     if (paired == TRUE){
-        testlabs[tests == "ttest"]    <- "Paired t-test"
-        testlabs[tests == "ranksum"]    <- "Wilcoxon signed-rank"
+        testlabs[tests == "ttest"   ] <- "Paired t-test"
+        testlabs[tests == "ranksum" ] <- "Wilcoxon signed-rank"
     }
     
     testlabs <- tests
-    testlabs[tests == "chisq"] <- "Chi-squared"
-    testlabs[tests == "fe"]    <- "Fisher's exact"
-    testlabs[tests == "ttest"]    <- "T-test"
-    testlabs[tests == "ranksum"]    <- "Wilcoxon rank-sum"
-    testlabs[tests == "olr"]    <- "Ordinal LR"
+    testlabs[tests == "chisq"     ] <- "Chi-squared"
+    testlabs[tests == "fe"        ] <- "Fisher's exact"
+    testlabs[tests == "ttest"     ] <- "T-test"
+    testlabs[tests == "ranksum"   ] <- "Wilcoxon rank-sum"
+    testlabs[tests == "olr"       ] <- "Ordinal LR"
     
     ### if labels are NA, use variable names
     if (length(labels) == 1){
         labels <- rep(labels, length(covs))
     }
     labels[is.na(labels)] <- covs[is.na(labels)]
-    
-    ## if statlabs is TRUE add a note about which summary stats are displayed
-#     if (statlabs == TRUE){
-#         labels[stats == "mean_sd"] <- paste(labels[stats == "mean_sd"], ", Mean (SD)", sep="")
-#         labels[stats == "mean_sem"] <- paste(labels[stats == "mean_sem"], ", Mean (SEM)", sep="")
-#         labels[stats == "median_iqr"] <- paste(labels[stats == "median_iqr"], ", Median (IQR)", sep="")
-#         labels[stats == "median_range"] <- paste(labels[stats == "median_range"], ", Median [Min, Max]", sep="")
-#         labels[stats == "mean_median_range"] <- paste(labels[stats == "mean_median_range"], ", Mean, Median [Min, Max]", sep="")
-#         labels[stats == "mean_sd_range"] <- paste(labels[stats == "mean_sd_range"], ", Mean (SD) [Min, Max]", sep="")
-#         labels[stats == "mean_sd_median_range"] <- paste(labels[stats == "mean_sd_median_range"], sep="")
-#     }
     
     ### if tests is blank do not calculate a p-value
     if (length(tests) == 1){
@@ -219,7 +201,7 @@ nicetable <- function(df,
     pval[is.na(tests)] <- FALSE
     
     ### treat the by variables as a factor if not already
-    ### subset dataframe for non missing by values
+    ### subset dataframe for non missing 'by' values
     df[,by] <- as.factor(df[,by])
     total_levels <- 0
     if (sum(is.na(df[,by])) > 0){
@@ -229,10 +211,10 @@ nicetable <- function(df,
     }
     df <- df[!is.na(df[,by]),]
 
-
-    ## save color x number of rows per variable
+    ## save the number of rows per variable to use for table striping
     rgroup <- NULL
     
+    ## placeholder for final table
     sum_table <- NULL
     
     for (k in 1:length(covs)){
@@ -263,12 +245,12 @@ nicetable <- function(df,
             ### + 1 names column + 1 pvalue column + 1 test name column
             ### the number of rows is the number of levels + 1 for varname/label
             ### if there are missing values add another row for missing totals
-            if (missing == FALSE){
+            if (dispN == FALSE & dispmiss == FALSE){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 1 + nlevels(df[,covs[k]]))
             }
-            if (missing == TRUE){
+            if (dispN | dispmiss){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 2 + nlevels(df[,covs[k]]))
@@ -320,7 +302,6 @@ nicetable <- function(df,
             if (pval[k] == TRUE){
                 
                 freq <- table(df.complete[,covs[k]], df.complete[,by])
-                
 
                 if (tests[k] == "fe") {
                     try_fe <- try(fisher.test(freq))
@@ -382,23 +363,27 @@ nicetable <- function(df,
                 
                 tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
             }
-            
-            if (missing == TRUE){
-                tmp[nrow(tmp),1] <- "* Unknown/Missing"
-                tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
+
+            if (dispN){
+                tmp[nrow(tmp),1] <- "* N (non-missing)"
+                tmp[nrow(tmp),2] <- sum(!is.na(df[,covs[k]]))
                 tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
-                    table(is.na(df[,covs[k]]), df[,by])["TRUE",]
+                    table(!is.na(df[,covs[k]]), df[,by])["TRUE",]
             }
-            
-            if (missing == FALSE & dispmiss == TRUE){
+            if (dispmiss & missing == FALSE){
                 lastrow <- rep(NA, ncol(tmp))
                 lastrow[1] <- "* Unknown/Missing"
                 lastrow[2:(nlevels(df[,by])+2)] <- "0"
-                tmp <- rbind(tmp, lastrow)
+            }
+            if (dispmiss & missing == TRUE){
+              tmp[nrow(tmp),1] <- "* Unknown/Missing"
+              tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
+              tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
+                  table(is.na(df[,covs[k]]), df[,by])["TRUE",]
             }
             
             if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp))) 
-            if (k %% 2 != 0) rgroup <- c(rgroup, rep(color, nrow(tmp)))
+            if (k %% 2 != 0) rgroup <- c(rgroup, rep(color,  nrow(tmp)))
             if (blanks == TRUE){
                 blank <- rep(NA, ncol(tmp))
                 sum_table <- rbind(sum_table, blank, tmp)
@@ -419,7 +404,7 @@ nicetable <- function(df,
             ### the number of columns is the number of groups 
             ### + 1 names column + 1 pvalue column + 1 test name column
             ### the number of rows is 1 for no missing values and 2 if missing values
-            if (dispmiss == FALSE & dispN == FALSE)){
+            if (dispmiss == FALSE & dispN == FALSE){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 2)
@@ -431,7 +416,7 @@ nicetable <- function(df,
                                   nrow = 3)
                 }
             }
-            if (dispmiss == TRUE | dispN == TRUE)){
+            if (dispmiss | dispN ){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 3)
@@ -655,17 +640,23 @@ nicetable <- function(df,
                     tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
                 }
             }
-            if (dispN == TRUE){
+            if (dispN){
                 tmp[nrow(tmp),1] <- "* N (non-missing)"
                 tmp[nrow(tmp),2] <- sum(!is.na(df[,covs[k]]))
                 tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
                     table(!is.na(df[,covs[k]]), df[,by])["TRUE",]
             }
-            if (dispmiss == TRUE){
+            if (dispmiss){
                 tmp[nrow(tmp),1] <- "* Freq Missing"
+                if (missing){
                 tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
                 tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
                     table(is.na(df[,covs[k]]), df[,by])["TRUE",]
+                }
+                if (missing == FALSE){
+                  tmp[nrow(tmp),2] <- 0
+                  tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 0
+                }
             }
             
             if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp))) 
