@@ -370,16 +370,17 @@ nicetable <- function(df,
                 tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
                     table(!is.na(df[,covs[k]]), df[,by])["TRUE",]
             }
-            if (dispmiss & missing == FALSE){
-                lastrow <- rep(NA, ncol(tmp))
-                lastrow[1] <- "* Unknown/Missing"
-                lastrow[2:(nlevels(df[,by])+2)] <- "0"
-            }
-            if (dispmiss & missing == TRUE){
-              tmp[nrow(tmp),1] <- "* Unknown/Missing"
-              tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
-              tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
-                  table(is.na(df[,covs[k]]), df[,by])["TRUE",]
+            if (dispmiss){
+                if (missing){
+                  tmp[nrow(tmp),1] <- "* Unknown/Missing"
+                  tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
+                  tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
+                    table(is.na(df[,covs[k]]), df[,by])["TRUE",]
+                }
+                if (missing == FALSE){
+                  tmp[nrow(tmp),1] <- "* Unknown/Missing"
+                  tmp[nrow(tmp),2:(nlevels(df[,by])+2)] <- "0"
+                }
             }
             
             if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp))) 
