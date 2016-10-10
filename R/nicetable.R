@@ -651,7 +651,6 @@ nicetable <- function(df,
                     if (tests[k] == "jt"){
                       form <- as.formula(paste(covs[k], " ~ ", by, sep=""))
                       try_jt <- try(jt.test(form, data = df))
-                      print(try_jt)
                       
                       if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
                         p <- jt.test(form, data= df)[[6]][4]
