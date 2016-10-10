@@ -12,7 +12,9 @@ Imports:
     Hmisc,
     MASS,
     xtable,
-    htmlTable
+    htmlTable,
+    multiCA,
+    kSamples
 License: CC0
 LazyData: true
 Suggests:

@@ -44,6 +44,8 @@
 #' @import Hmisc 
 #' @importFrom MASS polr
 #' @importFrom htmlTable htmlTable
+#' @importFrom kSamples jt.test
+#' @importFrom multiCA multiCA.test
 #' @export 
 nicetable <- function(df,
                       covs,
@@ -168,24 +170,24 @@ nicetable <- function(df,
         tests[type == 2] <- "fe"
     }
     
-    ## fix any obvious mistakes 
-    ## if user selects ttest and the variables are categorical try a chisq test, etc.
-    tests[which((tests == "ttest"   | tests == "anova") & type == 2)] <- "chisq"
-    tests[which((tests == "ranksum" | tests == "kw")    & type == 2)] <- "fe"
-    tests[which(tests == "chisq" & type == 1)] <- "ttest"
-    tests[which(tests == "fe"    & type == 1)] <- "ranksum"
-    
-    if (paired == TRUE){
-        testlabs[tests == "ttest"   ] <- "Paired t-test"
-        testlabs[tests == "ranksum" ] <- "Wilcoxon signed-rank"
-    }
-    
+    # ## fix any obvious mistakes 
+    # ## if user selects ttest and the variables are categorical try a chisq test, etc.
+    # tests[which((tests == "ttest"   | tests == "anova") & type == 2)] <- "chisq"
+    # tests[which((tests == "ranksum" | tests == "kw")    & type == 2)] <- "fe"
+    # tests[which(tests == "chisq" & type == 1)] <- "ttest"
+    # tests[which(tests == "fe"    & type == 1)] <- "ranksum"
+    # 
+    # if (paired == TRUE){
+    #     testlabs[tests == "ttest"   ] <- "Paired t-test"
+    #     testlabs[tests == "ranksum" ] <- "Wilcoxon signed-rank"
+    # }
+    # 
     testlabs <- tests
-    testlabs[tests == "chisq"     ] <- "Chi-squared"
-    testlabs[tests == "fe"        ] <- "Fisher's exact"
-    testlabs[tests == "ttest"     ] <- "T-test"
-    testlabs[tests == "ranksum"   ] <- "Wilcoxon rank-sum"
-    testlabs[tests == "olr"       ] <- "Ordinal LR"
+    # testlabs[tests == "chisq"     ] <- "Chi-squared"
+    # testlabs[tests == "fe"        ] <- "Fisher's exact"
+    # testlabs[tests == "ttest"     ] <- "T-test"
+    # testlabs[tests == "ranksum"   ] <- "Wilcoxon rank-sum"
+    # testlabs[tests == "olr"       ] <- "Ordinal LR"
     
     ### if labels are NA, use variable names
     if (length(labels) == 1){
@@ -332,6 +334,36 @@ nicetable <- function(df,
                     
                     save <- lrtest(t, null)
                     p <- save[["Pr(>Chisq)"]][[2]]
+                }
+                if (tests[k] == "jt"){
+                  form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
+                  try_jt <- try(jt.test(form, data = df))
+                  
+                  if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
+                    p <- jt.test(form, data= df)[[6]][4]
+                    testlabs[k] <- "Jonckheere-Terpstra trend test"
+                  }
+                  
+                  if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
+                    p <- NA
+                    testlabs[k] <- NA
+                  } 
+                }
+                if (tests[k] == "multica"){
+                  form <- as.formula(paste(covs[k], "~", by, sep=""))
+                  try_mca <- try(multiCA.test(form, data = df))
+                  
+                  if (length(try_mca) > 1 & 
+                      is.finite(as.numeric(multiCA.test(form, data= df)[[1]][3]))){
+                    p <- as.numeric(multiCA.test(form, data= df)[[1]][3])
+                    testlabs[k] <- "Cochran-Armitage trend test"
+                  }
+                  
+                  if (length(try_mca) == 1 | 
+                      !is.finite(as.numeric(multiCA.test(form, data= df)[[1]][3]))){
+                    p <- NA
+                    testlabs[k] <- NA
+                  } 
                 }
                 ### if there is only one level do not do any tests
                 if (nlevels(df[,covs[k]]) < 2){
@@ -615,6 +647,21 @@ nicetable <- function(df,
                             testlabs[k] <- NA
                         }    
 
+                    }
+                    if (tests[k] == "jt"){
+                      form <- as.formula(paste(covs[k], " ~ ", by, sep=""))
+                      try_jt <- try(jt.test(form, data = df))
+                      print(try_jt)
+                      
+                      if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
+                        p <- jt.test(form, data= df)[[6]][4]
+                        testlabs[k] <- "Jonckheere-Terpstra trend test"
+                      }
+                      
+                      if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
+                        p <- NA
+                        testlabs[k] <- NA
+                      } 
                     }
                     
                     tmp[1,(3+nlevels(df[,by]))] <- sprintf(pvalf, round(p, pval.dec))
