@@ -341,7 +341,7 @@ nicetable <- function(df,
                   
                   if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
                     p <- jt.test(form, data= df)[[6]][4]
-                    testlabs[k] <- "Jonckheere-Terpstra trend test"
+                    testlabs[k] <- "Jonckheere-Terpstra trend"
                   }
                   
                   if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
@@ -356,7 +356,7 @@ nicetable <- function(df,
                   if (length(try_mca) > 1 & 
                       is.finite(as.numeric(multiCA.test(form, data= df)[[1]][3]))){
                     p <- as.numeric(multiCA.test(form, data= df)[[1]][3])
-                    testlabs[k] <- "Cochran-Armitage trend test"
+                    testlabs[k] <- "Cochran-Armitage trend"
                   }
                   
                   if (length(try_mca) == 1 | 
@@ -654,7 +654,7 @@ nicetable <- function(df,
                       
                       if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
                         p <- jt.test(form, data= df)[[6]][4]
-                        testlabs[k] <- "Jonckheere-Terpstra trend test"
+                        testlabs[k] <- "Jonckheere-Terpstra trend"
                       }
                       
                       if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
