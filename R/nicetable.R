@@ -335,6 +335,21 @@ nicetable <- function(df,
                     save <- lrtest(t, null)
                     p <- save[["Pr(>Chisq)"]][[2]]
                 }
+                
+                if (tests[k] == "ranksum"){
+                  form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
+                  try_wilcox <- try(wilcox.test(form, data = df))
+                  
+                  if (length(try_wilcox) > 1 & is.finite(wilcox.test(form, data= df)$p.value)){
+                    p <- wilcox.test(form, data= df)$p.value
+                    testlabs[k] <- "Wilcoxon rank-sum"
+                  }
+                  if (length(try_wilcox) == 1 | !is.finite(wilcox.test(form, data= df)$p.value)){
+                    p <- NA
+                    testlabs[k] <- NA
+                  }
+                }
+                
                 if (tests[k] == "jt"){
                   form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
                   try_jt <- try(jt.test(form, data = df))
@@ -582,12 +597,10 @@ nicetable <- function(df,
                                 testlabs[k] <- "Wilcoxon signed-rank"
                             }
                         }
-                        
                         if (length(try_wilcox) == 1 | !is.finite(wilcox.test(form, data= df)$p.value)){
                             p <- NA
                             testlabs[k] <- NA
                         }
-
                     } 
                 
                     tmp[1,(3+nlevels(df[,by]))] <- sprintf(pvalf, round(p, pval.dec))
