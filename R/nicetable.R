@@ -337,16 +337,36 @@ nicetable <- function(df,
                 }
                 
                 if (tests[k] == "ranksum"){
-                  form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
-                  try_wilcox <- try(wilcox.test(form, data = df))
-                  
-                  if (length(try_wilcox) > 1 & is.finite(wilcox.test(form, data= df)$p.value)){
-                    p <- wilcox.test(form, data= df)$p.value
-                    testlabs[k] <- "Wilcoxon rank-sum"
+                  if (noby==0 & nlevels(df[,by]) == 2){
+                    form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
+                    try_wilcox <- try(wilcox.test(form, data = df))
+                    
+                    if (length(try_wilcox) > 1 & is.finite(wilcox.test(form, data= df)$p.value)){
+                      p <- wilcox.test(form, data= df)$p.value
+                      testlabs[k] <- "Wilcoxon rank-sum"
+                    }
+                    if (length(try_wilcox) == 1 | !is.finite(wilcox.test(form, data= df)$p.value)){
+                      p <- NA
+                      testlabs[k] <- NA
+                    }
                   }
-                  if (length(try_wilcox) == 1 | !is.finite(wilcox.test(form, data= df)$p.value)){
-                    p <- NA
-                    testlabs[k] <- NA
+                  if (noby==1){
+                    try_wilcox <- try(wilcox.test(as.numeric(df[,covs[k]]), 
+                                                  mu = (nlevels(df[,covs[k]])+1)/2))
+                    
+                    if (length(try_wilcox) > 1 & 
+                        is.finite(wilcox.test(as.numeric(df[,covs[k]]),
+                                              mu = (nlevels(df[,covs[k]])+1)/2)$p.value)){
+                      p <- wilcox.test(as.numeric(df[,covs[k]]),
+                                       mu = (nlevels(df[,covs[k]])+1)/2)$p.value
+                      testlabs[k] <- "Wilcoxon rank-sum"
+                    }
+                    if (length(try_wilcox) == 1 | 
+                        !is.finite(wilcox.test(as.numeric(df[,covs[k]]), 
+                                               mu = (nlevels(df[,covs[k]])+1)/2)$p.value)){
+                      p <- NA
+                      testlabs[k] <- NA
+                    }
                   }
                 }
                 
@@ -380,7 +400,7 @@ nicetable <- function(df,
                     testlabs[k] <- NA
                   } 
                 }
-                ### if there is only one level do not do any tests
+                ### if there is only one level of the covariate do not do any tests
                 if (nlevels(df[,covs[k]]) < 2){
                     p <- NA
                     testlabs[k] <- NA
@@ -555,6 +575,22 @@ nicetable <- function(df,
             }
             
             if (pval[k] == TRUE){
+              
+                if (is.na(by)){
+                  if (tests[k] == "ranksum"){
+                    
+                    try_wilcox <- try(wilcox.test(as.numeric(df[,by])))
+                    
+                    if (length(try_wilcox) > 1 & is.finite(wilcox.test(form, data= df)$p.value)){
+                      p <- wilcox.test(form, data= df)$p.value
+                      testlabs[k] <- "Wilcoxon rank-sum"
+                    }
+                    if (length(try_wilcox) == 1 | !is.finite(wilcox.test(form, data= df)$p.value)){
+                      p <- NA
+                      testlabs[k] <- NA
+                    }
+                  }
+                }
                 
                 form <- as.formula(paste(covs[k], "~", by))
                 
