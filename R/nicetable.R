@@ -359,7 +359,7 @@ nicetable <- function(df,
                                               mu = (nlevels(df[,covs[k]])+1)/2)$p.value)){
                       p <- wilcox.test(as.numeric(df[,covs[k]]),
                                        mu = (nlevels(df[,covs[k]])+1)/2)$p.value
-                      testlabs[k] <- "Wilcoxon rank-sum"
+                      testlabs[k] <- "Wilcoxon signed-rank"
                       # print(p)
                     }
                     if (length(try_wilcox) == 1 | 
