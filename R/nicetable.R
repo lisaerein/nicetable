@@ -360,6 +360,7 @@ nicetable <- function(df,
                       p <- wilcox.test(as.numeric(df[,covs[k]]),
                                        mu = (nlevels(df[,covs[k]])+1)/2)$p.value
                       testlabs[k] <- "Wilcoxon rank-sum"
+                      # print(p)
                     }
                     if (length(try_wilcox) == 1 | 
                         !is.finite(wilcox.test(as.numeric(df[,covs[k]]), 
@@ -772,6 +773,8 @@ nicetable <- function(df,
                                   " (n = ", table(df[,by]), ")", sep=""),
                             "p-value",
                             "Test")
+    # print(final_table)
+    
     if (pvalcol != TRUE | sum(!is.na(tests)) == 0){
         final_table <- final_table[,which(names(final_table) %in% c("p-value", "Test") == FALSE)]
     }
@@ -838,8 +841,14 @@ nicetable <- function(df,
                     final_html[,i] <- as.character(final_html[,i])
                 }
                 
-                data <- data.frame(final_html[,2])
-                names(data) <- paste("All (n = ", nrow(df), ")", sep="")
+                data <- data.frame(final_html[,2:ncol(final_html)])
+                if (ncol(final_html) > 2){
+                  names(data) <- c(paste("All (n = ", nrow(df), ")", sep=""),
+                                   "p-value", "Test")
+                }
+                if (ncol(final_html) == 2){
+                  names(data) <- c(paste("All (n = ", nrow(df), ")", sep=""))
+                }
                 
                  htmlver <- htmlTable(x = data,
                                       rnames = final_html[,"Variable"],
