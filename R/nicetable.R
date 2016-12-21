@@ -345,7 +345,11 @@ nicetable <- function(df,
                       p <- wilcox.test(form, data= df)$p.value
                       testlabs[k] <- "Wilcoxon rank-sum"
                     }
-                    if (length(try_wilcox) == 1 | !is.finite(wilcox.test(form, data= df)$p.value)){
+                    if (length(try_wilcox) == 1){
+                      p <- NA
+                      testlabs[k] <- NA
+                    }
+                    if (length(try_wilcox) > 1 & !is.finite(wilcox.test(form, data= df)$p.value)){
                       p <- NA
                       testlabs[k] <- NA
                     }
