@@ -341,15 +341,17 @@ nicetable <- function(df,
                     form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
                     try_wilcox <- try(wilcox.test(form, data = df))
                     
-                    if (length(try_wilcox) > 1 & is.finite(wilcox.test(form, data= df)$p.value)){
-                      p <- wilcox.test(form, data= df)$p.value
-                      testlabs[k] <- "Wilcoxon rank-sum"
+                    if (length(try_wilcox) > 1){
+                      if (is.finite(wilcox.test(form, data= df)$p.value)){
+                        p <- wilcox.test(form, data= df)$p.value
+                        testlabs[k] <- "Wilcoxon rank-sum"
+                      }
+                      if (!is.finite(wilcox.test(form, data= df)$p.value)){
+                        p <- NA
+                        testlabs[k] <- NA
+                      }
                     }
                     if (length(try_wilcox) == 1){
-                      p <- NA
-                      testlabs[k] <- NA
-                    }
-                    if (length(try_wilcox) > 1 & !is.finite(wilcox.test(form, data= df)$p.value)){
                       p <- NA
                       testlabs[k] <- NA
                     }
