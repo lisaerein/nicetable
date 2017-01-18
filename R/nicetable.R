@@ -211,7 +211,7 @@ nicetable <- function(df,
     total_levels <- 0
     if (sum(is.na(df[,by])) > 0){
         if (warnmissby == TRUE){
-            cat("* Note there were", sum(is.na(df[,by])), "entries missing", bylab, "which were excluded. \n\n")
+            cat("* Note there were", sum(is.na(df[,by])), "entries missing", bylab, "which were excluded from the table. \n\n")
         }
     }
     df <- df[!is.na(df[,by]),]
