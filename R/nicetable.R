@@ -52,6 +52,7 @@ nicetable <- function(df,
                       type, 
                       by = NA,
                       warnmissby = FALSE,
+                      bylab = NA,
                       orderfreq = FALSE,
                       labels = NA,
                       stats = "mean_sd_median_range",
@@ -77,6 +78,8 @@ nicetable <- function(df,
     if (is.na(by)){
         byref = TRUE
     } 
+  
+    if (is.na(bylab) & !is.na(by)) bylab <- by
     
     if (htmlTable == TRUE) printRMD = FALSE
     
@@ -208,7 +211,7 @@ nicetable <- function(df,
     total_levels <- 0
     if (sum(is.na(df[,by])) > 0){
         if (warnmissby == TRUE){
-            cat("There were", sum(is.na(df[,by])), "entries missing", by, "which were excluded.")
+            cat("* Note there were", sum(is.na(df[,by])), "entries missing", bylab, "which were excluded. \n\n")
         }
     }
     df <- df[!is.na(df[,by]),]
