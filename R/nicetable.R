@@ -339,7 +339,7 @@ nicetable <- function(df,
                     p <- save[["Pr(>Chisq)"]][[2]]
                 }
                 
-                if (tests[k] == "ranksum"){
+                if (tests[k] %in% c("ranksum","kw")){
                   if (noby==0 & nlevels(df[,by]) == 2){
                     form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
                     try_wilcox <- try(wilcox.test(form, data = df))
@@ -355,6 +355,25 @@ nicetable <- function(df,
                       }
                     }
                     if (length(try_wilcox) == 1){
+                      p <- NA
+                      testlabs[k] <- NA
+                    }
+                  }
+                  if (noby==0 & nlevels(df[,by]) > 2){
+                    form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
+                    try_kruskal <- try(kruskal.test(form, data = df))
+                    
+                    if (length(try_kruskal) > 1){
+                      if (is.finite(kruskal.test(form, data= df)$p.value)){
+                        p <- kruskal.test(form, data= df)$p.value
+                        testlabs[k] <- "Kruskal-Wallis"
+                      }
+                      if (!is.finite(kruskal.test(form, data= df)$p.value)){
+                        p <- NA
+                        testlabs[k] <- NA
+                      }
+                    }
+                    if (length(try_kruskal) == 1){
                       p <- NA
                       testlabs[k] <- NA
                     }
