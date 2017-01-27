@@ -45,6 +45,7 @@
 #' @importFrom MASS polr
 #' @importFrom htmlTable htmlTable
 #' @importFrom kSamples jt.test
+#' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
 #' @export 
 nicetable <- function(df,
@@ -400,18 +401,34 @@ nicetable <- function(df,
                 }
                 
                 if (tests[k] == "jt"){
-                  form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
-                  try_jt <- try(jt.test(form, data = df))
+                  ## create numeric versions of covariate by by variable
+                  numcovk <- as.numeric(df[,covs[k]])
+                  numby <- as.numeric(df[,by])
                   
-                  if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
-                    p <- jt.test(form, data= df)[[6]][4]
-                    testlabs[k] <- "Jonckheere-Terpstra trend"
+                  # form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
+                  # try_jt <- try(jt.test(form, data = df))
+                  
+                  try_jt <- try(jonckheere.test(x = numcovk, g = numby))
+                  
+                  p <- NA
+                  testlabs[k] <- NA
+                  if ((length(try_jt) > 1)) {
+                    jtres <- jonckheere.test(x = numcovk, g = numby) 
+                    if (is.finite(jtres$p.value)) {
+                      p <- jtres$p.value
+                      testlabs[k] <- "Jonckheere-Terpstra trend"
+                    }
                   }
-                  
-                  if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
-                    p <- NA
-                    testlabs[k] <- NA
-                  } 
+                  # 
+                  # if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
+                  #   p <- jt.test(form, data= df)[[6]][4]
+                  #   testlabs[k] <- "Jonckheere-Terpstra trend"
+                  # }
+                  # 
+                  # if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
+                  #   p <- NA
+                  #   testlabs[k] <- NA
+                  # } 
                 }
                 if (tests[k] == "multica"){
                   form <- as.formula(paste(covs[k], "~", by, sep=""))
