@@ -27,6 +27,7 @@
 #' @param cont.dec Number of decimals for continuous variable summary stats (mean, median, sd, iqr). Default = 2.
 #' @param pval.dec Number of significant figures for p-values. Default = 3.
 #' @param allcol Whether to diplay the "All Data" column. Default = TRUE.
+#' @param alllab Label for All column (default = "All (n = )").
 #' @param testcol Whether to display the test column (names of tests). Default = TRUE.
 #' @param dispmiss Whether to display number missing for continuous variables. Default = FALSE.
 #' @param dispN Whether to display number non-missing for continuous variables. Default = FALSE. 
@@ -64,6 +65,7 @@ nicetable <- function(df,
                       cont.dec = 2,
                       pval.dec = 3,
                       allcol = TRUE,
+                      alllab = NA,
                       testcol = TRUE,
                       pvalcol = TRUE,
 		                  dispmiss = FALSE,
@@ -811,9 +813,12 @@ nicetable <- function(df,
         }
     }
     
+    if (!is.na(alllab)) all <- alllab
+    if ( is.na(alllab)) all <- "All"
+    
     final_table <- data.frame(sum_table)
     names(final_table) <- c("Variable", 
-                            paste("All (n = ", nrow(df), ")", sep=""),
+                            paste(all, " (n = ", nrow(df), ")", sep=""),
                             paste(capitalize(levels(df[,by])), 
                                   " (n = ", table(df[,by]), ")", sep=""),
                             "p-value",
@@ -888,11 +893,11 @@ nicetable <- function(df,
                 
                 data <- data.frame(final_html[,2:ncol(final_html)])
                 if (ncol(final_html) > 2){
-                  names(data) <- c(paste("All (n = ", nrow(df), ")", sep=""),
+                  names(data) <- c(paste(all, " (n = ", nrow(df), ")", sep=""),
                                    "p-value", "Test")
                 }
                 if (ncol(final_html) == 2){
-                  names(data) <- c(paste("All (n = ", nrow(df), ")", sep=""))
+                  names(data) <- c(paste(all, " (n = ", nrow(df), ")", sep=""))
                 }
                 
                  htmlver <- htmlTable(x = data,
@@ -901,7 +906,7 @@ nicetable <- function(df,
                                       col.rgroup=rgroup)
                  print(htmlver)
                 
-                names(final_table)[2] <- paste("All (n = ", nrow(df), ")", sep="")
+                names(final_table)[2] <- paste(all, " (n = ", nrow(df), ")", sep="")
                 return(final_table)
             }   
     } 
