@@ -9,6 +9,7 @@
 #' @param type Vector indicating type of each covariate - use 1 for continuous and 2 for categorical (REQUIRED). 
 #' @param by Variable to stratify by. Defaults to NA (no stratifying variable). No tests will be done.
 #' @param warnmissby Whether to warn user that there are missing by variable values. Missing values will be excluded. Default = FALSE.
+#' @param bylab Label for stratification variable to use in warnmissby statement. Default is NA.
 #' @param orderfreq If TRUE, all unordered (non-factor) categorical variables will be ordered by descending frequency. Default = FALSE.
 #' @param labels Labels for covariates. Default = NA in which case variable names will be used.
 #' @param stats Statistics to display for continuous variables (mean_sd_median_range (default), mean_sd, mean_sem, median_range, or median_iqr). 
@@ -214,7 +215,12 @@ nicetable <- function(df,
     total_levels <- 0
     if (sum(is.na(df[,by])) > 0){
         if (warnmissby == TRUE){
-            cat("* Note there were", sum(is.na(df[,by])), "entries missing", bylab, "which were excluded from the table. \n\n")
+            if (sum(is.na(df[,by])) ==1){
+              cat("* Note there was 1 entry missing", bylab, "which was excluded from the table. \n\n")
+            }
+            if (sum(is.na(df[,by])) ==1){
+              cat("* Note there were", sum(is.na(df[,by])), "entries missing", bylab, "which were excluded from the table. \n\n")
+            }
         }
     }
     df <- df[!is.na(df[,by]),]
