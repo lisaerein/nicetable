@@ -218,7 +218,7 @@ nicetable <- function(df,
             if (sum(is.na(df[,by])) ==1){
               cat("* Note there was 1 entry missing", bylab, "which was excluded from the table. \n\n")
             }
-            if (sum(is.na(df[,by])) ==1){
+            if (sum(is.na(df[,by])) > 1){
               cat("* Note there were", sum(is.na(df[,by])), "entries missing", bylab, "which were excluded from the table. \n\n")
             }
         }
