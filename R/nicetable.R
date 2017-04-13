@@ -44,13 +44,13 @@
 #' @importFrom doBy summaryBy
 #' @importFrom xtable xtable
 #' @import Hmisc 
+#' @import knitr
 #' @importFrom MASS polr
 #' @importFrom htmlTable htmlTable
 #' @importFrom kSamples jt.test
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
 #' @importFrom htmltools html_print
-#' @importFrom knitr knit_print 
 #' @export 
 nicetable <- function(df,
                       covs,

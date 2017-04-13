@@ -2,6 +2,7 @@
 
 export(nicetable)
 import(Hmisc)
+import(knitr)
 importFrom(MASS,polr)
 importFrom(doBy,summaryBy)
 importFrom(htmlTable,htmlTable)
@@ -10,4 +11,3 @@ importFrom(kSamples,jt.test)
 importFrom(clinfun,jonckheere.test)
 importFrom(multiCA,multiCA.test)
 importFrom(htmltools,html_print)
-importFrom(knitr, knit_print)
