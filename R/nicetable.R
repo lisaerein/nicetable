@@ -50,6 +50,7 @@
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
 #' @importFrom htmltools html_print
+#' @importFrom knitr knit_print
 #' @export 
 nicetable <- function(df,
                       covs,

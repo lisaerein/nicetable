@@ -16,7 +16,8 @@ Imports:
     multiCA,
     kSamples,
     clinfun,
-	htmltools
+	htmltools,
+	knitr
 License: CC0
 LazyData: true
 Suggests:
