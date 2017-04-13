@@ -79,7 +79,34 @@ nicetable <- function(df,
                       blanks = TRUE,
                       htmlTable = FALSE,
                       color = "#EEEEEE",
-		              byref = TRUE){
+		                  byref = TRUE){
+  
+  
+  # by = NA
+  # warnmissby = FALSE
+  # bylab = NA
+  # orderfreq = FALSE
+  # labels = NA
+  # stats = "mean_sd_median_range"
+  # statlabs = TRUE
+  # tests = NA
+  # percent = 2
+  # perc.dec = 1
+  # cont.dec = 2
+  # pval.dec = 3
+  # allcol = TRUE
+  # alllab = NA
+  # testcol = TRUE
+  # pvalcol = TRUE
+  # dispmiss = FALSE
+  # dispN = FALSE
+  # printRMD = TRUE
+  # paired = FALSE
+  # id = NA
+  # blanks = TRUE
+  # htmlTable = TRUE
+  # color = "#EEEEEE"
+  # byref = TRUE
     
     if (is.na(by)){
         byref = TRUE
@@ -890,7 +917,8 @@ nicetable <- function(df,
                                      css.cell='border-collapse: collapse; padding: 4px;',
                                      col.rgroup=rgroup)
                 
-                knit_print(htmlver)
+                print(htmlver)
+                # knit_print(htmlver)
                 # html_print(htmlver)
                 return(final_table)
             }
@@ -901,26 +929,27 @@ nicetable <- function(df,
                     final_html[,i] <- as.character(final_html[,i])
                 }
                 
-                data <- data.frame(final_html[,2:ncol(final_html)])
+                data2 <- data.frame(final_html[,2:ncol(final_html)])
                 if (ncol(final_html) > 2){
-                  names(data) <- c(paste(all, " (n = ", nrow(df), ")", sep=""),
+                  names(data2) <- c(paste(all, " (n = ", nrow(df), ")", sep=""),
                                    "p-value", "Test")
                 }
                 if (ncol(final_html) == 2){
-                  names(data) <- c(paste(all, " (n = ", nrow(df), ")", sep=""))
+                  names(data2) <- c(paste(all, " (n = ", nrow(df), ")", sep=""))
                 }
                 
-                 htmlver <- htmlTable(x = data,
+                 htmlver <- htmlTable(x = data2,
                                       rnames = final_html[,"Variable"],
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
                  
-                 knit_print(htmlver)
+                 print(htmlver)
+                 # knit_print(htmlver)
                  # html_print(htmlver)
                 
                 names(final_table)[2] <- paste(all, " (n = ", nrow(df), ")", sep="")
                 return(final_table)
-            }   
+            }
     } 
    
 }
