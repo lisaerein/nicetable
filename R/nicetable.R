@@ -49,7 +49,7 @@
 #' @importFrom kSamples jt.test
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
-#' @importFrom html_print htmltools
+#' @importFrom htmltools html_print
 #' @export 
 nicetable <- function(df,
                       covs,
