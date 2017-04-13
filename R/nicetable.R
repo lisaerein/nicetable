@@ -888,7 +888,7 @@ nicetable <- function(df,
                                      rnames = final_html[,"Variable"],
                                      css.cell='border-collapse: collapse; padding: 4px;',
                                      col.rgroup=rgroup)
-                print(htmlver)
+                html_print(htmlver)
                 return(final_table)
             }
                     
