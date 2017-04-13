@@ -15,7 +15,8 @@ Imports:
     htmlTable,
     multiCA,
     kSamples,
-    clinfun
+    clinfun,
+	htmltools
 License: CC0
 LazyData: true
 Suggests:

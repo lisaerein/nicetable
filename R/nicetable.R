@@ -49,6 +49,7 @@
 #' @importFrom kSamples jt.test
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
+#' @importFrom html_print htmltools
 #' @export 
 nicetable <- function(df,
                       covs,
@@ -910,7 +911,7 @@ nicetable <- function(df,
                                       rnames = final_html[,"Variable"],
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
-                 print(htmlver)
+                 html_print(htmlver)
                 
                 names(final_table)[2] <- paste(all, " (n = ", nrow(df), ")", sep="")
                 return(final_table)
