@@ -50,7 +50,7 @@
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
 #' @importFrom htmltools html_print
-#' @importFrom knitr knit_print
+#' @importFrom knitr knit_print 
 #' @export 
 nicetable <- function(df,
                       covs,
@@ -890,7 +890,7 @@ nicetable <- function(df,
                                      css.cell='border-collapse: collapse; padding: 4px;',
                                      col.rgroup=rgroup)
                 html_print(htmlver)
-                knit_print(htmlver)
+                knit_print.html(htmlver)
                 return(final_table)
             }
                     
@@ -914,7 +914,7 @@ nicetable <- function(df,
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
                  html_print(htmlver)
-                 knit_print(htmlver)
+                 knit_print.html(htmlver)
                 
                 names(final_table)[2] <- paste(all, " (n = ", nrow(df), ")", sep="")
                 return(final_table)
