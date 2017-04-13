@@ -889,7 +889,7 @@ nicetable <- function(df,
                                      rnames = final_html[,"Variable"],
                                      css.cell='border-collapse: collapse; padding: 4px;',
                                      col.rgroup=rgroup)
-                # html_print(htmlver)
+                html_print(htmlver)
                 knit_print(htmlver)
                 return(final_table)
             }
@@ -913,7 +913,7 @@ nicetable <- function(df,
                                       rnames = final_html[,"Variable"],
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
-                 # html_print(htmlver)
+                 html_print(htmlver)
                  knit_print(htmlver)
                 
                 names(final_table)[2] <- paste(all, " (n = ", nrow(df), ")", sep="")
