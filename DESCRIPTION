@@ -20,5 +20,5 @@ Imports:
     knitr
 License: CC0
 LazyData: true
-Suggests:
+Suggests: knitr
 VignetteBuilder: knitr

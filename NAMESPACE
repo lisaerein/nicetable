@@ -2,7 +2,7 @@
 
 export(nicetable)
 import(Hmisc)
-import(knitr)
+importFrom(knitr, knit_print)
 importFrom(MASS,polr)
 importFrom(doBy,summaryBy)
 importFrom(htmlTable,htmlTable)

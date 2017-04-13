@@ -16,9 +16,9 @@ Imports:
     multiCA,
     kSamples,
     clinfun,
-	htmltools,
-	knitr
+	  htmltools,
+	  knitr
 License: CC0
 LazyData: true
-Suggests:
+Suggests: knirt
 VignetteBuilder: knitr
