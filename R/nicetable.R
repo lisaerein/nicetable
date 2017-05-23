@@ -75,8 +75,8 @@ nicetable <- function(df,
                       pvalcol = TRUE,
 		                  dispmiss = FALSE,
                       dispN = FALSE,
-		                  mingroup = NA,
-		                  mincell = NA,
+		                  mingroup = 0,
+		                  mincell = 0,
                       printRMD = TRUE,
                       paired = FALSE,
 		                  id = NA,
@@ -129,6 +129,7 @@ nicetable <- function(df,
         df$Allcol <- "ALL"
         by <- "Allcol"
         allcol <- FALSE
+        mincell <- NA
     }
     
     if (paired == TRUE){
