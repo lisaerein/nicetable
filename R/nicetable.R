@@ -129,7 +129,6 @@ nicetable <- function(df,
         df$Allcol <- "ALL"
         by <- "Allcol"
         allcol <- FALSE
-        mincell <- NA
     }
     
     if (paired == TRUE){
@@ -365,7 +364,6 @@ nicetable <- function(df,
             if (pval[k] == TRUE){
                 
                 freq <- table(df.complete[,covs[k]], df.complete[,by])
-                if (sum(as.matrix(freq) < mincell, na.rm=T) > 0) tests[k] <- NA
 
                 if (tests[k] == "fe") {
                     try_fe <- try(fisher.test(freq))
