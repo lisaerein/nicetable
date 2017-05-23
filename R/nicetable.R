@@ -314,8 +314,8 @@ nicetable <- function(df,
             
             ### if group size (NA's removed) is less than min, do not report p-values
             if (sum(as.matrix(table(df.complete[,by])) < mingroup, na.rm=T) > 0) {
-              pval[k] <- FALSE
-              tests[k] <- NA
+              pval[k] <- TRUE
+              tests[k] <- "NR"
             }
             
             freq.all <- table(df.complete[,covs[k]])                 
@@ -480,6 +480,7 @@ nicetable <- function(df,
                   #   testlabs[k] <- NA
                   # } 
                 }
+                
                 if (tests[k] == "multica"){
                   form <- as.formula(paste(covs[k], "~", by, sep=""))
                   try_mca <- try(multiCA.test(form, data = df))
@@ -507,6 +508,12 @@ nicetable <- function(df,
                     tmp[1,(3+nlevels(df[,by]))] <- "--"
                     p <- 99
                 }
+                if (tests[k] == "NR") {
+                  tmp[1,(3+nlevels(df[,by]))] <- "(NR)"
+                  testlabs[k] <- ""
+                  p <- 99
+                }
+                
                 if (htmlTable){
                   if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.0001"
                   if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.001"
@@ -566,8 +573,8 @@ nicetable <- function(df,
             
             ### if group size (NA's removed) is less than min, do not report p-values
             if (sum(as.matrix(table(df.complete[,by])) < mingroup, na.rm=T) > 0) {
-              pval[k] <- FALSE
-              tests[k] <- NA
+              pval[k] <- TRUE
+              tests[k] <- "NR"
             }
             
             ### create a mini table for this variable alone
@@ -745,6 +752,11 @@ nicetable <- function(df,
                     if (is.na(p)) {
                         tmp[1,(3+nlevels(df[,by]))] <- "--"
                         p <- 99
+                    }
+                    if (tests[k] == "NR") {
+                      tmp[1,(3+nlevels(df[,by]))] <- "(NR)"
+                      testlabs[k] <- ""
+                      p <- 99
                     }
                     if (htmlTable){
                       if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.0001"
