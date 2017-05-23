@@ -33,6 +33,8 @@
 #' @param dispmiss Whether to display number missing for continuous variables. Default = FALSE.
 #' @param dispN Whether to display number non-missing for continuous variables. Default = FALSE. 
 #' dispN will overwrite dispmiss if both are TRUE.
+#' @param mingroup Minimum non-missing group size to report p-value (NA by default).
+#' @param mincell Minimum non-missing cell size to report p-value (NA by default). 
 #' @param printRMD Whether to print resulting table to Rmd via xtable. Default = TRUE.
 #' @param htmlTable Whether to use htmlTable package to display table (instead of xtable). Default = FALSE.
 #' @param color Hex color to use for htmlTable output. Default = "#EEEEEE" (grey).
@@ -73,6 +75,8 @@ nicetable <- function(df,
                       pvalcol = TRUE,
 		                  dispmiss = FALSE,
                       dispN = FALSE,
+		                  mingroup = NA,
+		                  mincell = NA,
                       printRMD = TRUE,
                       paired = FALSE,
 		                  id = NA,
@@ -100,6 +104,8 @@ nicetable <- function(df,
   # pvalcol = TRUE
   # dispmiss = FALSE
   # dispN = FALSE
+  # mingroup = NA
+  # mincell = NA
   # printRMD = TRUE
   # paired = FALSE
   # id = NA
@@ -306,6 +312,12 @@ nicetable <- function(df,
             ### create temporary dataset with NA's removed
             df.complete <- df[!is.na(df[,covs[k]]),]
             
+            ### if group size (NA's removed) is less than min, do not report p-values
+            if (sum(as.matrix(table(df.complete[,by])) < mingroup, na.rm=T) > 0) {
+              pval[k] <- FALSE
+              tests[k] <- NA
+            }
+            
             freq.all <- table(df.complete[,covs[k]])                 
             perc.all <- 100*(table(df.complete[,covs[k]])/nrow(df.complete))
             
@@ -345,6 +357,7 @@ nicetable <- function(df,
             if (pval[k] == TRUE){
                 
                 freq <- table(df.complete[,covs[k]], df.complete[,by])
+                if (sum(as.matrix(freq) < mincell, na.rm=T) > 0) tests[k] <- NA
 
                 if (tests[k] == "fe") {
                     try_fe <- try(fisher.test(freq))
@@ -550,6 +563,12 @@ nicetable <- function(df,
             
             ### create temporary dataset with NA's removed
             df.complete <- df[!is.na(df[,covs[k]]),]
+            
+            ### if group size (NA's removed) is less than min, do not report p-values
+            if (sum(as.matrix(table(df.complete[,by])) < mingroup, na.rm=T) > 0) {
+              pval[k] <- FALSE
+              tests[k] <- NA
+            }
             
             ### create a mini table for this variable alone
             ### the number of columns is the number of groups 
