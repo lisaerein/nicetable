@@ -320,7 +320,7 @@ nicetable <- function(df,
             }
             ### if cell size (NA's removed) is less than min, do not report p-values
             mincell_tab <- as.matrix(table(df.complete[,covs[k]], df.complete[,by]))
-            if (sum(mincell_tab< mincell, na.rm=T) > 0) {
+            if (sum(mincell_tab < mincell, na.rm=T) > 0) {
               pval[k] <- TRUE
               tests[k] <- "NR"
             }
