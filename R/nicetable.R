@@ -33,8 +33,8 @@
 #' @param dispmiss Whether to display number missing for continuous variables. Default = FALSE.
 #' @param dispN Whether to display number non-missing for continuous variables. Default = FALSE. 
 #' dispN will overwrite dispmiss if both are TRUE.
-#' @param mingroup Minimum non-missing group size to report p-value (NA by default).
-#' @param mincell Minimum non-missing cell size to report p-value (NA by default). 
+#' @param mingroup Minimum non-missing group size needed to report p-value (0 by default - report all p-values).
+#' @param mincell Minimum non-missing cell size needed to report p-value (0 by default - report all p-values). 
 #' @param printRMD Whether to print resulting table to Rmd via xtable. Default = TRUE.
 #' @param htmlTable Whether to use htmlTable package to display table (instead of xtable). Default = FALSE.
 #' @param color Hex color to use for htmlTable output. Default = "#EEEEEE" (grey).

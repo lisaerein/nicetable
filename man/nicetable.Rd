@@ -9,9 +9,8 @@ nicetable(df, covs, type, by = NA, warnmissby = FALSE, bylab = NA,
   statlabs = TRUE, tests = NA, percent = 2, perc.dec = 1,
   cont.dec = 2, pval.dec = 3, allcol = TRUE, alllab = NA,
   testcol = TRUE, pvalcol = TRUE, dispmiss = FALSE, dispN = FALSE,
-  mingroup = NA, mincell = NA, printRMD = TRUE, paired = FALSE,
-  id = NA, blanks = TRUE, htmlTable = FALSE, color = "#EEEEEE",
-  byref = TRUE)
+  mingroup = 0, mincell = 0, printRMD = TRUE, paired = FALSE, id = NA,
+  blanks = TRUE, htmlTable = FALSE, color = "#EEEEEE", byref = TRUE)
 }
 \arguments{
 \item{df}{Dataframe object name (REQUIRED).}
@@ -64,9 +63,9 @@ Fisher's Exact test ("fe") are currently supported.}
 \item{dispN}{Whether to display number non-missing for continuous variables. Default = FALSE. 
 dispN will overwrite dispmiss if both are TRUE.}
 
-\item{mingroup}{Minimum non-missing group size to report p-value (NA by default).}
+\item{mingroup}{Minimum non-missing group size needed to report p-value (0 by default - report all p-values).}
 
-\item{mincell}{Minimum non-missing cell size to report p-value (NA by default).}
+\item{mincell}{Minimum non-missing cell size needed to report p-value (0 by default - report all p-values).}
 
 \item{printRMD}{Whether to print resulting table to Rmd via xtable. Default = TRUE.}
 
