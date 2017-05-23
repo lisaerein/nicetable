@@ -509,8 +509,8 @@ nicetable <- function(df,
                     p <- 99
                 }
                 if (tests[k] == "NR") {
-                  tmp[1,(3+nlevels(df[,by]))] <- "(NR)"
-                  testlabs[k] <- ""
+                  tmp[1,(3+nlevels(df[,by]))] <- "NA"
+                  testlabs[k] <- "--"
                   p <- 99
                 }
                 
@@ -754,8 +754,8 @@ nicetable <- function(df,
                         p <- 99
                     }
                     if (tests[k] == "NR") {
-                      tmp[1,(3+nlevels(df[,by]))] <- "(NR)"
-                      testlabs[k] <- ""
+                      tmp[1,(3+nlevels(df[,by]))] <- "NR"
+                      testlabs[k] <- "--"
                       p <- 99
                     }
                     if (htmlTable){
