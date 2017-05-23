@@ -313,7 +313,14 @@ nicetable <- function(df,
             df.complete <- df[!is.na(df[,covs[k]]),]
             
             ### if group size (NA's removed) is less than min, do not report p-values
-            if (sum(as.matrix(table(df.complete[,by])) < mingroup, na.rm=T) > 0) {
+            mingroup_tab <- as.matrix(table(df.complete[,by]))
+            if (sum(mingroup_tab < mingroup, na.rm=T) > 0) {
+              pval[k] <- TRUE
+              tests[k] <- "NR"
+            }
+            ### if cell size (NA's removed) is less than min, do not report p-values
+            mincell_tab <- as.matrix(table(df.complete[,covs[k]], df.complete[,by]))
+            if (sum(mincell_tavb< mincell, na.rm=T) > 0) {
               pval[k] <- TRUE
               tests[k] <- "NR"
             }
@@ -509,7 +516,7 @@ nicetable <- function(df,
                     p <- 99
                 }
                 if (tests[k] == "NR") {
-                  tmp[1,(3+nlevels(df[,by]))] <- "NA"
+                  tmp[1,(3+nlevels(df[,by]))] <- "NR"
                   testlabs[k] <- "--"
                   p <- 99
                 }
@@ -572,7 +579,8 @@ nicetable <- function(df,
             df.complete <- df[!is.na(df[,covs[k]]),]
             
             ### if group size (NA's removed) is less than min, do not report p-values
-            if (sum(as.matrix(table(df.complete[,by])) < mingroup, na.rm=T) > 0) {
+            mingroup_tab <- as.matrix(table(df.complete[,by]))
+            if (sum(mingroup_tab < mingroup, na.rm=T) > 0) {
               pval[k] <- TRUE
               tests[k] <- "NR"
             }
