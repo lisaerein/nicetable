@@ -630,6 +630,8 @@ nicetable <- function(df,
                                            data = df,
                                            FUN = mean_sem)[,2])
                 tmp[2,1] <- "* Mean (SEM)"
+                tmp[2, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
+                )
             } 
             if (stats[k] == "median_iqr"){
                 tmp[2, 2] <- median_iqr(df[,covs[k]])
@@ -638,6 +640,7 @@ nicetable <- function(df,
                                            data = df,
                                            FUN = median_iqr)[,2])
                 tmp[2,1] <- "* Median (IQR)"
+                tmp[2, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
             } 
             if (stats[k] == "median_range"){
                 tmp[2, 2] <- median_range(df[,covs[k]])
@@ -646,6 +649,7 @@ nicetable <- function(df,
                                            data = df,
                                            FUN = median_range)[,2])
                 tmp[2,1] <- "* Median [Min, Max]"
+                tmp[2, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
             } 
             if (stats[k] == "mean_sd_median_range"){
                 tmp[2,2] <- mean_sd(df[,covs[k]])
@@ -660,6 +664,8 @@ nicetable <- function(df,
                                            FUN = median_range)[,2])
                 tmp[2,1] <- "* Mean (SD)"
                 tmp[3,1] <- "* Median [Min, Max]"
+                tmp[2, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
+                tmp[3, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[3, 3:(2+nlevels(df[,by]))])
             }
             if (stats[k] == "mean_sd_median_iqr"){
                 tmp[2,2] <- mean_sd(df[,covs[k]])
@@ -674,6 +680,8 @@ nicetable <- function(df,
                                            FUN = median_iqr)[,2])
                 tmp[2,1] <- "* Mean (SD)"
                 tmp[3,1] <- "* Median (IQR)"
+                tmp[2, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
+                tmp[3, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[3, 3:(2+nlevels(df[,by]))])
             }
             if (stats[k] == "mean_sd_median_q1q3"){
               tmp[2,2] <- mean_sd(df[,covs[k]])
@@ -688,6 +696,8 @@ nicetable <- function(df,
                                        FUN = median_q1q3)[,2])
               tmp[2,1] <- "* Mean (SD)"
               tmp[3,1] <- "* Median [Q1, Q3]"
+              tmp[2, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
+              tmp[3, 3:(2+nlevels(df[,by]))] <- grepl("NA|Inf|-Inf|NaN","--",tmp[3, 3:(2+nlevels(df[,by]))])
             }
             
             if (pval[k] == TRUE){
