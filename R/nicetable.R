@@ -631,7 +631,6 @@ nicetable <- function(df,
                                            FUN = mean_sem)[,2])
                 tmp[2,1] <- "* Mean (SEM)"
                 tmp[2, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
-                )
             } 
             if (stats[k] == "median_iqr"){
                 tmp[2, 2] <- median_iqr(df[,covs[k]])
