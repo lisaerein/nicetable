@@ -37,6 +37,7 @@
 #' @param mincell Minimum non-missing cell size needed to report p-value (0 by default - report all p-values). 
 #' @param printRMD Whether to print resulting table to Rmd via xtable. Default = TRUE.
 #' @param htmlTable Whether to use htmlTable package to display table (instead of xtable). Default = FALSE.
+#' @param htmltitle Title for 1st column in htmlTable.
 #' @param color Hex color to use for htmlTable output. Default = "#EEEEEE" (grey).
 #' @param blanks Should blank rows be used as variable separators? Default = TRUE.
 #' @param percent Should row (1) or column (2, default) percents be used?
@@ -961,6 +962,7 @@ nicetable <- function(df,
             if (noby == 0){
                 htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
                                      rnames = final_html[,"Variable"],
+                                     rowlabel = htmltitle,
                                      css.cell='border-collapse: collapse; padding: 4px;',
                                      col.rgroup=rgroup)
                 
@@ -987,6 +989,7 @@ nicetable <- function(df,
                 
                  htmlver <- htmlTable(x = data2,
                                       rnames = final_html[,"Variable"],
+                                      rowlabel = htmltitle,
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
                  
