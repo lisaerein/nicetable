@@ -83,6 +83,7 @@ nicetable <- function(df,
 		                  id = NA,
                       blanks = TRUE,
                       htmlTable = FALSE,
+		                  htmltitle = "",
                       color = "#EEEEEE",
 		                  byref = TRUE){
   
