@@ -964,6 +964,7 @@ nicetable <- function(df,
                 htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
                                      rnames = final_html[,"Variable"],
                                      rowlabel = htmltitle,
+                                     escape.html = F,
                                      css.cell='border-collapse: collapse; padding: 4px;',
                                      col.rgroup=rgroup)
                 
@@ -991,6 +992,7 @@ nicetable <- function(df,
                  htmlver <- htmlTable(x = data2,
                                       rnames = final_html[,"Variable"],
                                       rowlabel = htmltitle,
+                                      escape.html = F,
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
                  
