@@ -901,12 +901,12 @@ nicetable <- function(df,
     if ( is.na(alllab)) all <- "All"
     
     final_table <- data.frame(sum_table)
-    names(final_table) <- c("Variable", 
-                            paste(all, " (n = ", nrow(df), ")", sep=""),
-                            paste(capitalize(levels(df[,by])), 
-                                  " (n = ", table(df[,by]), ")", sep=""),
-                            "p-value",
-                            "Test")
+    names(final_table) <-  c("Variable",
+                             paste("N =", nrow(df)),
+                             paste("N =", table(df[,by])),
+                             "p-value",
+                             "Test")
+
     # print(final_table)
     
     if (pvalcol != TRUE | sum(!is.na(tests)) == 0){
@@ -936,6 +936,8 @@ nicetable <- function(df,
     if (printRMD == FALSE & htmlTable == FALSE){
         return(final_table)
     }
+    
+    nms <- names(final_table)
 
     if (htmlTable == TRUE){
         
@@ -958,6 +960,17 @@ nicetable <- function(df,
             final_html[head,"Variable"] <- paste("<b>",
                                                 final_html[head,"Variable"],
                                                 "<b/>", sep="")
+            
+            if (sum(nms %in% c("p-value", "Test")) == 0){
+                cgroup <- c(all, capitalize(levels(df[,by])))
+                if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
+                n.cgroup <- rep(1, length(cgroup))
+            }
+            if (sum(nms %in% c("p-value", "Test") > 0)){
+                cgroup <- c(all, capitalize(levels(df[,by])), "")
+                if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
+                n.cgroup <- c(rep(1, length(cgroup)-1), sum(nms %in% c("p-value", "Test")))
+            }
                 
         ### create htmlTable
             if (noby == 0){
@@ -965,6 +978,8 @@ nicetable <- function(df,
                                      rnames = final_html[,"Variable"],
                                      rowlabel = htmltitle,
                                      escape.html = F,
+                                     cgroup = cgroup,
+                                     n.cgroup = n.cgroup,
                                      css.cell='border-collapse: collapse; padding: 4px;',
                                      col.rgroup=rgroup)
                 
@@ -982,16 +997,26 @@ nicetable <- function(df,
                 
                 data2 <- data.frame(final_html[,2:ncol(final_html)])
                 if (ncol(final_html) > 2){
-                  names(data2) <- c(paste(all, " (n = ", nrow(df), ")", sep=""),
-                                   "p-value", "Test")
+                  names(data2) <- c(paste("n =", nrow(df)), "p-value", "Test")
                 }
                 if (ncol(final_html) == 2){
-                  names(data2) <- c(paste(all, " (n = ", nrow(df), ")", sep=""))
+                  names(data2) <- paste("n =", nrow(df))
+                }
+                
+                if (ncol(final_html) > 2){
+                    cgroup <- c(all, "")
+                    n.cgroup <- c(rep(1, length(cgroup)-1), sum(names(data2) %in% c("p-value", "Test")))
+                }
+                if (ncol(final_html) == 2){
+                    cgroup <- c(all)
+                    n.cgroup <- c(rep(1, length(cgroup)))
                 }
                 
                  htmlver <- htmlTable(x = data2,
                                       rnames = final_html[,"Variable"],
                                       rowlabel = htmltitle,
+                                      cgroup = cgroup,
+                                      n.cgroup = n.cgroup,
                                       escape.html = F,
                                       css.cell='border-collapse: collapse; padding: 4px;',
                                       col.rgroup=rgroup)
