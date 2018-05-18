@@ -74,18 +74,18 @@ nicetable <- function(df,
                       alllab = NA,
                       testcol = TRUE,
                       pvalcol = TRUE,
-		                  dispmiss = FALSE,
+		              dispmiss = FALSE,
                       dispN = FALSE,
-		                  mingroup = 0,
-		                  mincell = 0,
+		              mingroup = 0,
+		              mincell = 0,
                       printRMD = TRUE,
                       paired = FALSE,
-		                  id = NA,
+		              id = NA,
                       blanks = TRUE,
                       htmlTable = FALSE,
-		                  htmltitle = "",
+		              htmltitle = "",
                       color = "#EEEEEE",
-		                  byref = TRUE){
+		              byref = TRUE){
   
   
   # by = NA
@@ -901,28 +901,44 @@ nicetable <- function(df,
     if ( is.na(alllab)) all <- "All"
     
     final_table <- data.frame(sum_table)
-    names(final_table) <-  c("Variable",
-                             paste("N =", nrow(df)),
-                             paste("N =", table(df[,by])),
-                             "p-value",
-                             "Test")
+    
+    ### column names for non-html version
+    names(final_table) <- c("Variable", 
+                            paste(all, " (N = ", nrow(df), ")", sep=""),
+                            paste(capitalize(levels(df[,by])), 
+                                  " (N = ", table(df[,by]), ")", sep=""),
+                            "p-value",
+                            "Test")
+    
+    ## header names for htmlTable    
+    nms <- c("Variable",
+             paste("N =", nrow(df)),
+             paste("N =", table(df[,by])),
+             "p-value",
+             "Test")
 
     # print(final_table)
     
     if (pvalcol != TRUE | sum(!is.na(tests)) == 0){
+        nms <- nms[which(nms %in% c("p-value", "Test") == FALSE)]
         final_table <- final_table[,which(names(final_table) %in% c("p-value", "Test") == FALSE)]
+        
     }
     if (testcol != TRUE & pvalcol == TRUE){
+        nms <- nms[which(nms != "Test")]
         final_table <- final_table[,which(names(final_table) != "Test")]
     }
     if (allcol == TRUE & byref != TRUE){
+            nms <- nms[c(1,2,4:ncol(final_table))]
             final_table <- final_table[,c(1,2,4:ncol(final_table))] 
     }
     if (allcol != TRUE){
         if (byref == TRUE){
+            nms <- nms[c(1,3:ncol(final_table))]
             final_table <- final_table[,c(1,3:ncol(final_table))] 
         }
         if (byref != TRUE){
+            nms <- nms[c(1,4:ncol(final_table))]
             final_table <- final_table[,c(1,4:ncol(final_table))] 
         }
     }
@@ -936,8 +952,6 @@ nicetable <- function(df,
     if (printRMD == FALSE & htmlTable == FALSE){
         return(final_table)
     }
-    
-    nms <- names(final_table)
 
     if (htmlTable == TRUE){
         
@@ -975,6 +989,7 @@ nicetable <- function(df,
         ### create htmlTable
             if (noby == 0){
                 htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
+                                     header = nms[2:length(nms)],
                                      rnames = final_html[,"Variable"],
                                      rowlabel = htmltitle,
                                      escape.html = F,
@@ -1013,6 +1028,7 @@ nicetable <- function(df,
                 }
                 
                  htmlver <- htmlTable(x = data2,
+                                      header = nms[2:length(nms)],
                                       rnames = final_html[,"Variable"],
                                       rowlabel = htmltitle,
                                       cgroup = cgroup,
