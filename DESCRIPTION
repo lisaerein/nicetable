@@ -4,20 +4,15 @@ Version: 2.1
 Authors@R: "Lisa Rein <lisaerein@gmail.com> [aut, cre]"
 Description: This function creates a nice summary table. It returns a dataframe and
     prints an html table by default for use in R markdown documents.
-Depends:
-    R (>= 3.4.4)
-Imports:
-    MASS,
-    xtable,
-    htmlTable,
-    multiCA,
-    kSamples,
-    clinfun,
-    htmltools,
-    knitr
+Depends: R (>= 3.4.4)
+Imports: MASS, xtable, htmlTable, multiCA, kSamples, clinfun,
+        htmltools, knitr
 License: CC0
 LazyData: true
 Suggests: knitr
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0
 Encoding: UTF-8
+Author: "Lisa Rein" [aut, cre]
+Maintainer: "Lisa Rein" <lisaerein@gmail.com>
+Built: R 3.4.4; ; 2019-01-14 20:41:26 UTC; windows
