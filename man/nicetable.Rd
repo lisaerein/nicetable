@@ -5,104 +5,90 @@
 \title{Lisa's Summary Table Function}
 \usage{
 nicetable(df, covs, type, labels = NA, by = NA, bylab = NA,
-  warnmissby = FALSE, tests = NA, orderfreq = FALSE,
-  dispmiss = TRUE, dispN = FALSE, stats = c("mean_sd", "median_q1q3",
-  "minmax"), percent = 2, perc.dec = 1, cont.dec = 2, pval.dec = 3,
-  allcol = TRUE, alllab = NA, testcol = TRUE, pvalcol = TRUE,
-  mingroup = 0, mincell = 0, printRMD = FALSE, paired = FALSE,
-  id = NA, blanks = TRUE, htmlTable = TRUE, htmltitle = "",
-  htmlcaption = "", color = "#EEEEEE", byref = TRUE)
+  warnmissby = FALSE, allcol = TRUE, alllab = NA,
+  orderfreq = FALSE, percent = 2, perc.dec = 1,
+  stats = c("mean_sd", "median_q1q3", "minmax"), cont.dec = 2,
+  dispmiss = TRUE, dispN = FALSE, tests = NA, pval.dec = 3,
+  testcol = TRUE, pvalcol = TRUE, mingroup = 0, mincell = 0,
+  paired = FALSE, printRMD = FALSE, htmlTable = TRUE,
+  htmltitle = "", htmlcaption = "", color = "#EEEEEE",
+  blanks = TRUE, byref = TRUE)
 }
 \arguments{
-\item{df}{Dataframe object name (REQUIRED).}
+\item{df}{Dataset, a dataframe object (REQUIRED).}
 
-\item{covs}{Vector of covariates to include in table (REQUIRED).}
+\item{covs}{Character vector of variable names to include in table (REQUIRED).}
 
-\item{type}{Vector indicating type of each covariate - use 1 for continuous and 2 for categorical (REQUIRED).}
+\item{type}{Numeric vector indicating variable type for each covariate: 1 for continuous and 2 for categorical (REQUIRED).}
 
-\item{labels}{Labels for covariates. Default = NA in which case variable names will be used.}
+\item{labels}{Labels for covariates. Default = NA, variable names will be used.}
 
-\item{by}{Variable to stratify by. Defaults to NA (no stratifying variable and no tests).}
+\item{by}{Variable name (character) to stratify by. Defaults to NA, no stratifying variable and no tests.}
 
-\item{bylab}{Label for stratification variable to use in warnmissby statement. Default is NA.}
+\item{bylab}{Label (character) for stratification variable to use in warning statement. Default is NA.}
 
-\item{warnmissby}{Whether to warn user that there are missing by variable values. Missing values will be excluded. Default = FALSE.}
+\item{warnmissby}{Indicator (logical) to warn user of missing values in stratification variable. Default = FALSE.}
 
-\item{tests}{Vector of tests to calculate p-values. If only one is entered it will apply to all covs. 
-If NA (default), no tests will be done.
-Parametric ("p": t-test, chi-squared, anova), 
-Non-Parametric ("np": ranksum, Fisher's exact, kruskal-wallis), 
-T-test ("ttest"), Chi-Squared ("chisq"), 
-Kruskal-Wallis ("kw"), Mann-Whitney Rank Sum ("ranksum"), Anova ("anova"), 
-Fisher's Exact test ("fe") are currently supported.}
+\item{allcol}{Indicator (logical) to diplay the "All Data" column. Default = TRUE.}
 
-\item{orderfreq}{If TRUE, all unordered (non-factor) categorical variables will be ordered by descending frequency. Default = FALSE.}
+\item{alllab}{Character label for "All" column. Default = "All (N = )".}
 
-\item{dispmiss}{Whether to display number of missing values. Default = TRUE.}
+\item{orderfreq}{Indicator (logical) to order (non-factor) categorical variables by descending frequency. 
+Ordered factor variables will retain original ordering. Default = FALSE.}
 
-\item{dispN}{Whether to display number non-missing values. Default = FALSE.}
-
-\item{stats}{Statistics to display for continuous variables, a character vector of the following options 
-(default = mean_sd, median_q1q3, minmax):
-mean, 
-sd, 
-median, 
-iqr,
-q1,
-q3,
-q1q3,
-min,
-max,
-minmax,
-range,
-sem,
-mean_sd,
-mean_sem,
-median_iqr,
-median_range,
-median_q1q3,
-median_minmax}
-
-\item{percent}{Should row (1) or column (2, default) percents be used?}
+\item{percent}{Should row or column percents be used: 2 for row and 1 for column percents. Default is row percentages (2).}
 
 \item{perc.dec}{Number of decimal places for percentages (categorcal variables). Default = 1.}
 
-\item{cont.dec}{Number of decimal placess for continuous variable summary stats (mean, median, sd, iqr). Default = 2.}
+\item{stats}{Statistics to display for continuous variables, a character vector of the following options 
+(Default = mean_sd, median_q1q3, minmax): mean, sd, median, iqr, q1, q3, q1q3, min, max, minmax, range, sem,
+mean_sd, mean_sem, median_iqr, median_range, median_q1q3, median_minmax.}
+
+\item{cont.dec}{Number of decimal placess for continuous variable summary stats (mean, median, sd, iqr, etc.). Default = 2.}
+
+\item{dispmiss}{Indicator (logical) to display number of missing values. Default = TRUE.}
+
+\item{dispN}{Indicator (logical) to display number of non-missing values. Default = FALSE.}
+
+\item{tests}{Character vector of tests to calculate p-values. If only one is entered it will apply to all variables. 
+If NA (default), no tests will be done.
+Parametric ("p": T-test, Chi-squared, Anova, etc.), 
+Non-Parametric ("np": Rank-sum, Fisher's exact, Kruskal-Wallis, etc.), 
+T-test ("ttest"), Wilcoxon/Mann-Whitney Rank-sum ("ranksum"),
+Chi-squared ("chisq"), Fisher's Exact test ("fe"),
+Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.}
 
 \item{pval.dec}{Number of decimal places for p-values. Default = 3.}
 
-\item{allcol}{Whether to diplay the "All Data" column. Default = TRUE.}
+\item{testcol}{Indicator (logical) to display column with statistical test names. Default = TRUE.}
 
-\item{alllab}{Label for All column (default = "All (N = )").}
-
-\item{testcol}{Whether to display the test column (names of tests). Default = TRUE.}
-
-\item{pvalcol}{Should a column be included for p-values? TRUE (default) or FALSE.}
+\item{pvalcol}{Indicator (logical) to display column with p-values. Default = TRUE.}
 
 \item{mingroup}{Minimum non-missing group size required to report p-value (0 by default to report all p-values).}
 
 \item{mincell}{Minimum non-missing cell size required to report p-value (0 by default to report all p-values).}
 
-\item{printRMD}{Whether to print resulting table to Rmd via xtable. Default = TRUE.}
+\item{paired}{Indicator (logical) to use a test for paired data (only available for ttest and ranksum). Default = FALSE.}
 
-\item{paired}{Whether test should be paired (TRUE) or unpaired (FALSE = default). Only available for ttest and ranksum.}
+\item{printRMD}{Indicator (logical) to print resulting table to Rmd via xtable. Default = FALSE.}
 
-\item{id}{ID number to sort for paired data}
+\item{htmlTable}{Indicator (logical) to use htmlTable package to display table instead of xtable. Default = TRUE.}
 
-\item{blanks}{Should blank rows be used as variable separators (useful only for printRMD option)? Default = TRUE.}
+\item{htmltitle}{Character label for htmlTable variable names column. Default = " ".}
 
-\item{htmlTable}{Whether to use htmlTable package to display table (instead of xtable). Default = FALSE.}
+\item{htmlcaption}{Character title for htmlTable. Default = " ".}
 
-\item{htmltitle}{Title for 1st column in htmlTable.}
+\item{color}{Character Hex color to use for htmlTable striping. Default = "#EEEEEE" (light grey).}
 
-\item{color}{Hex color to use for htmlTable output. Default = "#EEEEEE" (light grey).}
+\item{blanks}{Indicator (logical) to add blank rows as variable separators for printRMD option. Default = TRUE.}
 
-\item{byref}{Should reference "by" category column be included (default = TRUE).}
+\item{byref}{Indicator (logical) to include reference "by" category column be included (default = TRUE).}
 }
 \description{
 This function creates a nice looking summary table.  
-The function returns a dataframe and prints an html table by default for use in R markdown documents.
+It returns a dataframe and prints an html table by default for use in R markdown documents.
 }
 \keyword{Lisa}
+\keyword{consulting}
 \keyword{summary}
 \keyword{table}

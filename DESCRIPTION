@@ -1,8 +1,8 @@
 Package: nicetable
-Title: This function creates a nice summary table.
+Title: This function creates a nice summary table
 Version: 2.1
 Authors@R: "Lisa Rein <lisaerein@gmail.com> [aut, cre]"
-Description: This function creates a nice looking summary table. It returns a dataframe and
+Description: This function creates a nice summary table. It returns a dataframe and
     prints an html table by default for use in R markdown documents.
 Depends:
     R (>= 3.4.4)
@@ -20,3 +20,4 @@ LazyData: true
 Suggests: knitr
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0
+Encoding: UTF-8
