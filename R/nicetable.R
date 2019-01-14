@@ -1,20 +1,36 @@
 
 #' Lisa's Summary Table Function 
 #'
-#' This function creates a nice looking summary table similar 
-#' to the Mayo clinic SAS table macro. The function returns a dataframe. 
-#' The function also prints an html table by default for use in R markdown documents.
+#' This function creates a nice looking summary table.  
+#' The function returns a dataframe and prints an html table by default for use in R markdown documents.
 #' @param df Dataframe object name (REQUIRED).
 #' @param covs Vector of covariates to include in table (REQUIRED).
 #' @param type Vector indicating type of each covariate - use 1 for continuous and 2 for categorical (REQUIRED). 
-#' @param by Variable to stratify by. Defaults to NA (no stratifying variable). No tests will be done.
+#' @param by Variable to stratify by. Defaults to NA (no stratifying variable and no tests).
 #' @param warnmissby Whether to warn user that there are missing by variable values. Missing values will be excluded. Default = FALSE.
 #' @param bylab Label for stratification variable to use in warnmissby statement. Default is NA.
 #' @param orderfreq If TRUE, all unordered (non-factor) categorical variables will be ordered by descending frequency. Default = FALSE.
 #' @param labels Labels for covariates. Default = NA in which case variable names will be used.
-#' @param stats Statistics to display for continuous variables (mean_sd_median_range (default), mean_sd, mean_sem, median_range, or median_iqr). 
-#' Can be a vector or length one to apply to all continuous variables.
-#' @param statlabs If TRUE, continuous variable labels will include description of summary statistics. Default = FALSE.
+#' @param stats Statistics to display for continuous variables, a character vector of the following options 
+#' (default = mean_sd, median_q1q3, minmax):
+#' mean, 
+#' sd, 
+#' median, 
+#' iqr,
+#' q1,
+#' q3,
+#' q1q3,
+#' min,
+#' max,
+#' minmax,
+#' range,
+#' sem,
+#' mean_sd,
+#' mean_sem,
+#' median_iqr,
+#' median_range,
+#' median_q1q3,
+#' median_minmax
 #' @param tests Vector of tests to calculate p-values. If only one is entered it will apply to all covs. 
 #' If NA (default), no tests will be done.
 #' Parametric ("p": t-test, chi-squared, anova), 
@@ -24,29 +40,26 @@
 #' Fisher's Exact test ("fe") are currently supported.
 #' @param paired Whether test should be paired (TRUE) or unpaired (FALSE = default). Only available for ttest and ranksum.
 #' @param id ID number to sort for paired data
-#' @param perc.dec Number of decimals for percentages (categorcal variables). Default = 1.
-#' @param cont.dec Number of decimals for continuous variable summary stats (mean, median, sd, iqr). Default = 2.
-#' @param pval.dec Number of significant figures for p-values. Default = 3.
+#' @param perc.dec Number of decimal places for percentages (categorcal variables). Default = 1.
+#' @param cont.dec Number of decimal placess for continuous variable summary stats (mean, median, sd, iqr). Default = 2.
+#' @param pval.dec Number of decimal places for p-values. Default = 3.
 #' @param allcol Whether to diplay the "All Data" column. Default = TRUE.
-#' @param alllab Label for All column (default = "All (n = )").
+#' @param alllab Label for All column (default = "All (N = )").
 #' @param testcol Whether to display the test column (names of tests). Default = TRUE.
-#' @param dispmiss Whether to display number missing for continuous variables. Default = FALSE.
-#' @param dispN Whether to display number non-missing for continuous variables. Default = FALSE. 
-#' dispN will overwrite dispmiss if both are TRUE.
-#' @param mingroup Minimum non-missing group size needed to report p-value (0 by default - report all p-values).
-#' @param mincell Minimum non-missing cell size needed to report p-value (0 by default - report all p-values). 
+#' @param dispmiss Whether to display number of missing values. Default = TRUE.
+#' @param dispN Whether to display number non-missing values. Default = FALSE. 
+#' @param mingroup Minimum non-missing group size required to report p-value (0 by default to report all p-values).
+#' @param mincell Minimum non-missing cell size required to report p-value (0 by default to report all p-values). 
 #' @param printRMD Whether to print resulting table to Rmd via xtable. Default = TRUE.
 #' @param htmlTable Whether to use htmlTable package to display table (instead of xtable). Default = FALSE.
 #' @param htmltitle Title for 1st column in htmlTable.
-#' @param color Hex color to use for htmlTable output. Default = "#EEEEEE" (grey).
-#' @param blanks Should blank rows be used as variable separators? Default = TRUE.
+#' @param color Hex color to use for htmlTable output. Default = "#EEEEEE" (light grey).
+#' @param blanks Should blank rows be used as variable separators (useful only for printRMD option)? Default = TRUE.
 #' @param percent Should row (1) or column (2, default) percents be used?
 #' @param pvalcol Should a column be included for p-values? TRUE (default) or FALSE. 
-#' @param byref Should reference "by" category column be included (default = TRUE)
-#' @keywords summary table lisa
-#' @importFrom doBy summaryBy
+#' @param byref Should reference "by" category column be included (default = TRUE).
+#' @keywords summary table Lisa
 #' @importFrom xtable xtable
-#' @import Hmisc 
 #' @importFrom knitr knit_print
 #' @importFrom MASS polr
 #' @importFrom htmlTable htmlTable
@@ -58,14 +71,15 @@
 nicetable <- function(df,
                       covs,
                       type, 
-                      by = NA,
-                      warnmissby = FALSE,
-                      bylab = NA,
-                      orderfreq = FALSE,
                       labels = NA,
-                      stats = "mean_sd_median_range",
-                      statlabs = TRUE,
+                      by = NA,
+                      bylab = NA,
+                      warnmissby = FALSE,
                       tests = NA,
+                      orderfreq = FALSE,
+                      dispmiss = TRUE,
+                      dispN = FALSE,
+                      stats = c("mean_sd", "median_q1q3", "minmax"),
                       percent = 2,
                       perc.dec = 1,
                       cont.dec = 2,
@@ -74,47 +88,22 @@ nicetable <- function(df,
                       alllab = NA,
                       testcol = TRUE,
                       pvalcol = TRUE,
-		              dispmiss = FALSE,
-                      dispN = FALSE,
 		              mingroup = 0,
 		              mincell = 0,
-                      printRMD = TRUE,
+                      printRMD = FALSE,
                       paired = FALSE,
 		              id = NA,
                       blanks = TRUE,
-                      htmlTable = FALSE,
+                      htmlTable = TRUE,
 		              htmltitle = "",
+		              htmlcaption = "",
                       color = "#EEEEEE",
 		              byref = TRUE){
   
-  
-  # by = NA
-  # warnmissby = FALSE
-  # bylab = NA
-  # orderfreq = FALSE
-  # labels = NA
-  # stats = "mean_sd_median_range"
-  # statlabs = TRUE
-  # tests = NA
-  # percent = 2
-  # perc.dec = 1
-  # cont.dec = 2
-  # pval.dec = 3
-  # allcol = TRUE
-  # alllab = NA
-  # testcol = TRUE
-  # pvalcol = TRUE
-  # dispmiss = FALSE
-  # dispN = FALSE
-  # mingroup = NA
-  # mincell = NA
-  # printRMD = TRUE
-  # paired = FALSE
-  # id = NA
-  # blanks = TRUE
-  # htmlTable = TRUE
-  # color = "#EEEEEE"
-  # byref = TRUE
+    simpleCap <- function(x) {
+      s <- strsplit(x, " ")[[1]]
+      paste(toupper(substring(s, 1,1)), substring(s, 2), sep="", collapse=" ")
+    }
     
     if (is.na(by)){
         byref = TRUE
@@ -133,6 +122,7 @@ nicetable <- function(df,
         allcol <- FALSE
     }
     
+    ### if data is paired, do not print a column for combined data
     if (paired == TRUE){
         allcol <- FALSE
     }
@@ -142,67 +132,90 @@ nicetable <- function(df,
     contf <- paste("%.", cont.dec, "f", sep="")
     
     ### define functions for continuous summary stats
-    mean_sd <- function(x){
-        paste(sprintf(contf, round(mean(x, na.rm=TRUE),cont.dec)), " (", 
-              sprintf(contf, round(  sd(x, na.rm=TRUE),cont.dec)), ")", sep="")
-    }
-    
-    median_iqr <- function(x){
-        paste(sprintf(contf, round(median(x, na.rm=TRUE),cont.dec)), " (", 
-              sprintf(contf, round(   IQR(x, na.rm=TRUE),cont.dec)), ")", sep="")
-    }
-    
-    median_q1q3 <- function(x){
-      paste(sprintf(contf, round(  median(x, na.rm=TRUE),              cont.dec)), " [", 
-            sprintf(contf, round(quantile(x, c(0.25), na.rm=T),cont.dec)), ", ", 
-            sprintf(contf, round(quantile(x, c(0.75), na.rm=T),cont.dec)), "]", sep="")
-    }
-    
-    median_range <- function(x){
-        paste(sprintf(contf, round(median(x, na.rm=TRUE),cont.dec)), " [", 
-              sprintf(contf, round(   min(x, na.rm=TRUE),cont.dec)), ", ", 
-              sprintf(contf, round(   max(x, na.rm=TRUE),cont.dec)), "]", sep="")
-    }
-    
-    mean_sd_median_range <- function(x){
-        paste(sprintf(contf, round(  mean(x, na.rm=TRUE), cont.dec)), " (",
-              sprintf(contf, round(    sd(x, na.rm=TRUE), cont.dec)), "), ",
-              sprintf(contf, round(median(x, na.rm=TRUE),cont.dec)), " [", 
-              sprintf(contf, round(   min(x, na.rm=TRUE),cont.dec)), ", ", 
-              sprintf(contf, round(   max(x, na.rm=TRUE),cont.dec)), "]", sep="")
-    }
-    
-    mean_sd_median_iqr <- function(x){
-        paste(sprintf(contf, round(  mean(x, na.rm=TRUE), cont.dec)), " (",
-              sprintf(contf, round(    sd(x, na.rm=TRUE), cont.dec)), "), ",
-              sprintf(contf, round(median(x, na.rm=TRUE),cont.dec)) , " (", 
-              sprintf(contf, round(   IQR(x, na.rm=TRUE),cont.dec)), ")", sep="")
-    }
     
     sem <- function(x) sqrt(var(x,na.rm=TRUE)/length(na.omit(x)))
-    mean_sem <- function(x){
-        paste(sprintf(contf, round(mean(x, na.rm=TRUE),cont.dec)), " (", 
-              sprintf(contf, round( sem(x)            ,cont.dec)), ")", sep="")
-    }
+    nice_sem    <- function(x) sprintf(contf, round(sem(x), cont.dec))
+    nice_mean   <- function(x) sprintf(contf, round(  mean(x, na.rm=TRUE), cont.dec))
+    nice_sd     <- function(x) sprintf(contf, round(    sd(x, na.rm=TRUE), cont.dec))
+    nice_median <- function(x) sprintf(contf, round(median(x, na.rm=TRUE), cont.dec))
+    nice_iqr    <- function(x) sprintf(contf, round(   IQR(x, na.rm=TRUE), cont.dec))
+    nice_min    <- function(x) sprintf(contf, round(   min(x, na.rm=TRUE), cont.dec))
+    nice_max    <- function(x) sprintf(contf, round(   max(x, na.rm=TRUE), cont.dec))
+    nice_q1     <- function(x) sprintf(contf, round(quantile(x, c(0.25), na.rm=T), cont.dec))
+    nice_q3     <- function(x) sprintf(contf, round(quantile(x, c(0.75), na.rm=T), cont.dec))
+    nice_range  <- function(x) sprintf(contf, round(diff(range(x, na.rm=TRUE)), cont.dec))
     
-    ### if only one option is entered, repeat for all variables
+    nice_minmax <- function(x) paste(nice_min(x), ", ", nice_max(x), sep="")
+    nice_q1q3   <- function(x) paste(nice_q1(x), ", ",  nice_q3(x), sep="")
+    
+    nice_mean_sd  <- function(x) paste(nice_mean(x), " (",  nice_sd(x), ")", sep="")
+    nice_mean_sem <- function(x) paste(nice_mean(x), " (", nice_sem(x), ")", sep="")
+    nice_median_iqr    <- function(x) paste(nice_median(x), " (",   nice_iqr(x), ")", sep="")
+    nice_median_range  <- function(x) paste(nice_median(x), " (", nice_range(x), ")", sep="")
+    nice_median_q1q3   <- function(x) paste(nice_median(x), " [", nice_q1q3(x) , "]", sep="")
+    nice_median_minmax <- function(x) paste(nice_median(x), " [", nice_minmax(x),"]", sep="")
+    
+    nicelab <- data.frame("nicefun" = c("nice_mean", 
+                                        "nice_sd",
+                                        "nice_sem",
+                                        "nice_median",
+                                        "nice_iqr",
+                                        "nice_q1", 
+                                        "nice_q3",
+                                        "nice_q1q3",
+                                        "nice_min",
+                                        "nice_max",
+                                        "nice_minmax",
+                                        "nice_range",
+                                        "nice_mean_sd",
+                                        "nice_median_range",
+                                        "nice_median_iqr",
+                                        "nice_median_q1q3",
+                                        "nice_median_minmax"),
+                          "label" = c("* Mean", 
+                                      "* SD",
+                                      "* SEM",
+                                      "* Median",
+                                      "* IQR",
+                                      "* Q1", 
+                                      "* Q3",
+                                      "* Q1, Q3",
+                                      "* Min",
+                                      "* Max",
+                                      "* Min, Max",
+                                      "* Range",
+                                      "* Mean (SD)",
+                                      "* Median (Range)",
+                                      "* Median (IQR)",
+                                      "* Median [Q1, Q3]",
+                                      "* Median [Min, Max]"), 
+                          stringsAsFactors = FALSE)
+    rownames(nicelab) <- nicelab$nicefun
+    nicelab$fun <- unlist(lapply(nicelab[,"nicefun"], function(x) strsplit(x, "nice_")[[1]][2]))
+    
+    ### if only one variable type is entered, repeat for all variables
     if (length(type) == 1) {
         type <- rep(type, length(covs))
     }
-    if (length(stats) == 1){
-        stats <- rep(stats, length(covs))
-    }
-    stats[type == 2] <- "NA"
+
+    ### Use same stats for all continuous variables
+    ### Trouble-shoot user error by removing bad values
+    ### For categorical variables, stats = "NA"
+    if (stats[1] == "mean_sd_median_range") stats <- c("mean_sd", "median_minmax") ## for backwards compatability
+    stats <- tolower(stats)
+    stats <- unique(stats)
+    stats <- stats[stats %in% nicelab$fun]
+    stats <- rep(list(stats), length(covs))
+    stats[which(type == 2)] <- "NA"
+    
+    ### Trouble-shoot user entered tests
+    tests <- tolower(tests)
     if (length(tests) == 1){
         tests <- rep(tests, length(covs))
     }
     if (length(percent) == 1){
         percent <- rep(percent, length(covs))
     }
-    
-    ### make all options lower case
-    tests <- tolower(tests)
-    stats <- tolower(stats)
     
     if (!is.na(tests[1]) & tests[1] == "p"){
         tests[type == 1] <- "ttest"
@@ -214,24 +227,7 @@ nicetable <- function(df,
         tests[type == 2] <- "fe"
     }
     
-    # ## fix any obvious mistakes 
-    # ## if user selects ttest and the variables are categorical try a chisq test, etc.
-    # tests[which((tests == "ttest"   | tests == "anova") & type == 2)] <- "chisq"
-    # tests[which((tests == "ranksum" | tests == "kw")    & type == 2)] <- "fe"
-    # tests[which(tests == "chisq" & type == 1)] <- "ttest"
-    # tests[which(tests == "fe"    & type == 1)] <- "ranksum"
-    # 
-    # if (paired == TRUE){
-    #     testlabs[tests == "ttest"   ] <- "Paired t-test"
-    #     testlabs[tests == "ranksum" ] <- "Wilcoxon signed-rank"
-    # }
-    # 
     testlabs <- tests
-    # testlabs[tests == "chisq"     ] <- "Chi-squared"
-    # testlabs[tests == "fe"        ] <- "Fisher's exact"
-    # testlabs[tests == "ttest"     ] <- "T-test"
-    # testlabs[tests == "ranksum"   ] <- "Wilcoxon rank-sum"
-    # testlabs[tests == "olr"       ] <- "Ordinal LR"
     
     ### if labels are NA, use variable names
     if (length(labels) == 1){
@@ -274,12 +270,6 @@ nicetable <- function(df,
         
         if (type[k] == 2){
             
-            df[grepl("Missing", df[,covs[k]]), covs[k]] <- NA
-            
-            ### check for missing covariate values 
-            missing <- FALSE
-            if (sum(is.na(df[,covs[k]])) > 0) missing <- TRUE
-            
             ### treat categorical covariates as factors
             ### if orderfreq = TRUE then reorder all unordered factor levels by descending frequency
             ### if covariate is already a factor keep the original ordering
@@ -296,16 +286,9 @@ nicetable <- function(df,
             ### + 1 names column + 1 pvalue column + 1 test name column
             ### the number of rows is the number of levels + 1 for varname/label
             ### if there are missing values add another row for missing totals
-            if (dispN == FALSE & dispmiss == FALSE){
                 tmp <- matrix(data = NA, 
                               ncol = nlevels(df[,by]) + 4, 
                               nrow = 1 + nlevels(df[,covs[k]]))
-            }
-            if (dispN | dispmiss){
-                tmp <- matrix(data = NA, 
-                              ncol = nlevels(df[,by]) + 4, 
-                              nrow = 2 + nlevels(df[,covs[k]]))
-            }
             
             ### add first column variable label and names of levels
             tmp[1,1] <- labels[k]
@@ -318,13 +301,15 @@ nicetable <- function(df,
             mingroup_tab <- as.matrix(table(df.complete[,by]))
             if (sum(mingroup_tab < mingroup, na.rm=T) > 0) {
               pval[k] <- TRUE
-              tests[k] <- "NR"
+              tests[k] <- "--"
+              testlabs[k] <- "--"
             }
             ### if cell size (NA's removed) is less than min, do not report p-values
             mincell_tab <- as.matrix(table(df.complete[,covs[k]], df.complete[,by]))
             if (sum(mincell_tab < mincell, na.rm=T) > 0) {
               pval[k] <- TRUE
-              tests[k] <- "NR"
+              tests[k] <- "--"
+              testlabs[k] <- "--"
             }
             
             freq.all <- table(df.complete[,covs[k]])                 
@@ -362,6 +347,32 @@ nicetable <- function(df,
             
             tmp[2:(1+nlevels(df.complete[,covs[k]])), 3:(2+nlevels(df.complete[,by]))] <- 
                 paste(freq, " (", perc2, "%)", sep="")
+            
+            if (dispN) {
+                tmp <- rbind(tmp, rep(NA, ncol(tmp)))
+                tmp[nrow(tmp), 1] <- "* N (non-missing)" 
+                
+                ### calculate N for "All column"
+                tmp[nrow(tmp), 2] <- sum(!is.na(df[,covs[k]]))
+                
+                ### calculate N by subgroup
+                for (l in 1:nlevels(df[,by])) {
+                    tmp[nrow(tmp), (2 + l)] <- sum(!is.na(df[df[,by] == levels(df[,by])[l] ,covs[k]]))
+                }
+            } 
+            
+            if (dispmiss) {
+                tmp <- rbind(tmp, rep(NA, ncol(tmp)))
+                tmp[nrow(tmp), 1] <- "* Freq Missing" 
+                
+                ### calculate missing for "All column"
+                tmp[nrow(tmp), 2] <- sum(is.na(df[,covs[k]]))
+                
+                ### calculate missing by subgroup
+                for (l in 1:nlevels(df[,by])) {
+                    tmp[nrow(tmp), (2 + l)] <- sum(is.na(df[df[,by] == levels(df[,by])[l] ,covs[k]]))
+                }
+            } 
             
             if (pval[k] == TRUE){
                 
@@ -516,8 +527,8 @@ nicetable <- function(df,
                     tmp[1,(3+nlevels(df[,by]))] <- "--"
                     p <- 99
                 }
-                if (tests[k] == "NR") {
-                  tmp[1,(3+nlevels(df[,by]))] <- "NR"
+                if (tests[k] == "--") {
+                  tmp[1,(3+nlevels(df[,by]))] <- "--"
                   testlabs[k] <- "--"
                   p <- 99
                 }
@@ -541,25 +552,6 @@ nicetable <- function(df,
                 
                 tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
             }
-
-            if (dispN){
-                tmp[nrow(tmp),1] <- "* N (non-missing)"
-                tmp[nrow(tmp),2] <- sum(!is.na(df[,covs[k]]))
-                tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
-                    table(!is.na(df[,covs[k]]), df[,by])["TRUE",]
-            }
-            if (dispmiss){
-                if (missing){
-                  tmp[nrow(tmp),1] <- "* Unknown/Missing"
-                  tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
-                  tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
-                    table(is.na(df[,covs[k]]), df[,by])["TRUE",]
-                }
-                if (missing == FALSE){
-                  tmp[nrow(tmp),1] <- "* Unknown/Missing"
-                  tmp[nrow(tmp),2:(nlevels(df[,by])+2)] <- "0"
-                }
-            }
             
             if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp))) 
             if (k %% 2 != 0) rgroup <- c(rgroup, rep(color,  nrow(tmp)))
@@ -572,10 +564,6 @@ nicetable <- function(df,
         
         if (type[k] == 1){
             
-            ### check for missing covariate values 
-            missing <- FALSE
-            if (sum(is.na(df[,covs[k]])) > 0) missing <- TRUE
-            
             ### create temporary dataset with NA's removed
             df.complete <- df[!is.na(df[,covs[k]]),]
             
@@ -583,123 +571,63 @@ nicetable <- function(df,
             mingroup_tab <- as.matrix(table(df.complete[,by]))
             if (sum(mingroup_tab < mingroup, na.rm=T) > 0) {
               pval[k] <- TRUE
-              tests[k] <- "NR"
+              tests[k] <- "--"
+              testlabs[k] <- "--"
             }
             
             ### create a mini table for this variable alone
-            ### the number of columns is the number of groups 
-            ### + 1 names column + 1 pvalue column + 1 test name column
-            ### the number of rows is 1 for no missing values and 2 if missing values
-            if (dispmiss == FALSE & dispN == FALSE){
-                tmp <- matrix(data = NA, 
-                              ncol = nlevels(df[,by]) + 4, 
-                              nrow = 2)
-                if (stats[k] == "mean_sd_median_range" | 
-                    stats[k] == "mean_sd_median_iqr"   |
-                    stats[k] == "mean_sd_median_q1q3"  ){
-                    tmp <- matrix(data = NA, 
-                                  ncol = nlevels(df[,by]) + 4, 
-                                  nrow = 3)
-                }
-            }
-            if (dispmiss | dispN ){
-                tmp <- matrix(data = NA, 
-                              ncol = nlevels(df[,by]) + 4, 
-                              nrow = 3)
-                if (stats[k] == "mean_sd_median_range" | 
-                    stats[k] == "mean_sd_median_iqr"   |
-                    stats[k] == "mean_sd_median_q1q3"  ){
-                    tmp <- matrix(data = NA, 
-                                  ncol = nlevels(df[,by]) + 4, 
-                                  nrow = 4)
-                }
-            }
+            ### the number of columns is the number of groups + 4
+            ### (1 all column + 1 names column + 1 pvalue column + 1 test name column)
+            ### the number of rows is the number of stats requested 
+            
+            tmp <- matrix(data = NA, 
+                          ncol = nlevels(df[,by]) + 4,
+                          nrow = 1 + (length(stats[[k]])))
             
             tmp[1,1] <- paste(labels[k], sep=" ") 
             
-            if (stats[k] == "mean_sd"){
-                tmp[2, 2] <- mean_sd(df[,covs[k]])
-                tmp[2, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = mean_sd)[,2])
-                tmp[2,1] <- "* Mean (SD)"
-            } 
-            if (stats[k] == "mean_sem"){
-                tmp[2, 2] <- mean_sem(df[,covs[k]])
-                tmp[2, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = mean_sem)[,2])
-                tmp[2,1] <- "* Mean (SEM)"
-                tmp[2, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
-            } 
-            if (stats[k] == "median_iqr"){
-                tmp[2, 2] <- median_iqr(df[,covs[k]])
-                tmp[2, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = median_iqr)[,2])
-                tmp[2,1] <- "* Median (IQR)"
-                tmp[2, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
-            } 
-            if (stats[k] == "median_range"){
-                tmp[2, 2] <- median_range(df[,covs[k]])
-                tmp[2, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = median_range)[,2])
-                tmp[2,1] <- "* Median [Min, Max]"
-                tmp[2, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
-            } 
-            if (stats[k] == "mean_sd_median_range"){
-                tmp[2,2] <- mean_sd(df[,covs[k]])
-                tmp[3,2] <- median_range(df[,covs[k]])
-                tmp[2, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = mean_sd)[,2])
-                tmp[3, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = median_range)[,2])
-                tmp[2,1] <- "* Mean (SD)"
-                tmp[3,1] <- "* Median [Min, Max]"
-                tmp[2, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
-                tmp[3, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[3, 3:(2+nlevels(df[,by]))])
+            for (s in 1:length(stats[[k]])){
+                ### get corresponding function and label
+                nicefun <- paste("nice", stats[[k]][s], sep="_")
+                tmp[(1 + s), 1] <- nicelab[nicefun, "label"]
+                
+                ### calculate stats for "All column"
+                tmp[(1 + s), 2] <- do.call(nicefun, args = list("x" = df[,covs[k]]))
+                tmp[(1 + s), 2] <- gsub("NA|Inf|-Inf|NaN", "--", tmp[(1 + s), 2])
+                
+                ### calculate stats for subgroups
+                for (l in 1:nlevels(df[,by])){
+                    tmp[(1 + s), (2 + l)] <- do.call(nicefun, args = list("x" = df[df[,by] == levels(df[,by])[l] ,covs[k]]))
+                    tmp[(1 + s), (2 + l)] <- gsub("NA|Inf|-Inf|NaN", "--", tmp[(1 + s), (2 + l)])
+                }
             }
-            if (stats[k] == "mean_sd_median_iqr"){
-                tmp[2,2] <- mean_sd(df[,covs[k]])
-                tmp[3,2] <- median_iqr(df[,covs[k]])
-                tmp[2, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = mean_sd)[,2])
-                tmp[3, 3:(2+nlevels(df[,by]))] <- 
-                    as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                           data = df,
-                                           FUN = median_iqr)[,2])
-                tmp[2,1] <- "* Mean (SD)"
-                tmp[3,1] <- "* Median (IQR)"
-                tmp[2, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
-                tmp[3, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[3, 3:(2+nlevels(df[,by]))])
-            }
-            if (stats[k] == "mean_sd_median_q1q3"){
-              tmp[2,2] <- mean_sd(df[,covs[k]])
-              tmp[3,2] <- median_q1q3(df[,covs[k]])
-              tmp[2, 3:(2+nlevels(df[,by]))] <- 
-                as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                       data = df,
-                                       FUN = mean_sd)[,2])
-              tmp[3, 3:(2+nlevels(df[,by]))] <- 
-                as.character(summaryBy(as.formula(paste(covs[k], "~", by)), 
-                                       data = df,
-                                       FUN = median_q1q3)[,2])
-              tmp[2,1] <- "* Mean (SD)"
-              tmp[3,1] <- "* Median [Q1, Q3]"
-              tmp[2, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[2, 3:(2+nlevels(df[,by]))])
-              tmp[3, 3:(2+nlevels(df[,by]))] <- gsub("NA|Inf|-Inf|NaN","--",tmp[3, 3:(2+nlevels(df[,by]))])
-            }
+            
+            if (dispN) {
+                tmp <- rbind(tmp, rep(NA, ncol(tmp)))
+                tmp[nrow(tmp), 1] <- "* N (non-missing)" 
+                
+                ### calculate missing for "All column"
+                tmp[nrow(tmp), 2] <- sum(!is.na(df[,covs[k]]))
+                
+                ### calculate missing by subgroups
+                for (l in 1:nlevels(df[,by])) {
+                    tmp[nrow(tmp), (2 + l)] <- sum(!is.na(df[df[,by] == levels(df[,by])[l] ,covs[k]]))
+                }
+            } 
+            
+            if (dispmiss) {
+                tmp <- rbind(tmp, rep(NA, ncol(tmp)))
+                tmp[nrow(tmp), 1] <- "* Freq Missing" 
+                
+                ### calculate missing for "All column"
+                tmp[nrow(tmp), 2] <- sum(is.na(df[,covs[k]]))
+                
+                ### calculate missing by subgroups
+                for (l in 1:nlevels(df[,by])) {
+                    tmp[nrow(tmp), (2 + l)] <- sum(is.na(df[df[,by] == levels(df[,by])[l] ,covs[k]]))
+                }
+            } 
+
             
             if (pval[k] == TRUE){
               
@@ -771,8 +699,8 @@ nicetable <- function(df,
                         tmp[1,(3+nlevels(df[,by]))] <- "--"
                         p <- 99
                     }
-                    if (tests[k] == "NR") {
-                      tmp[1,(3+nlevels(df[,by]))] <- "NR"
+                    if (tests[k] == "--") {
+                      tmp[1,(3+nlevels(df[,by]))] <- "--"
                       testlabs[k] <- "--"
                       p <- 99
                     }
@@ -868,24 +796,6 @@ nicetable <- function(df,
                     tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
                 }
             }
-            if (dispN){
-                tmp[nrow(tmp),1] <- "* N (non-missing)"
-                tmp[nrow(tmp),2] <- sum(!is.na(df[,covs[k]]))
-                tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
-                    table(!is.na(df[,covs[k]]), df[,by])["TRUE",]
-            }
-            if (dispmiss){
-                tmp[nrow(tmp),1] <- "* Freq Missing"
-                if (missing){
-                tmp[nrow(tmp),2] <- sum(is.na(df[,covs[k]]))
-                tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 
-                    table(is.na(df[,covs[k]]), df[,by])["TRUE",]
-                }
-                if (missing == FALSE){
-                  tmp[nrow(tmp),2] <- 0
-                  tmp[nrow(tmp),3:(2+nlevels(df[,by]))] <- 0
-                }
-            }
             
             if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp))) 
             if (k %% 2 != 0) rgroup <- c(rgroup, rep(color, nrow(tmp))) 
@@ -905,7 +815,7 @@ nicetable <- function(df,
     ### column names for non-html version
     names(final_table) <- c("Variable", 
                             paste(all, " (N = ", nrow(df), ")", sep=""),
-                            paste(capitalize(levels(df[,by])), 
+                            paste(unlist(lapply(levels(df[,by]), simpleCap)), 
                                   " (N = ", table(df[,by]), ")", sep=""),
                             "p-value",
                             "Test")
@@ -976,12 +886,12 @@ nicetable <- function(df,
                                                 "<b/>", sep="")
             
             if (sum(nms %in% c("p-value", "Test")) == 0){
-                cgroup <- c(all, capitalize(levels(df[,by])))
+                cgroup <- c(all, unlist(lapply(levels(df[,by]), simpleCap)))
                 if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
                 n.cgroup <- rep(1, length(cgroup))
             }
             if (sum(nms %in% c("p-value", "Test") > 0)){
-                cgroup <- c(all, capitalize(levels(df[,by])), "")
+                cgroup <- c(all, unlist(lapply(levels(df[,by]), simpleCap)), "")
                 if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
                 n.cgroup <- c(rep(1, length(cgroup)-1), sum(nms %in% c("p-value", "Test")))
             }
@@ -992,6 +902,7 @@ nicetable <- function(df,
                                      header = nms[2:length(nms)],
                                      rnames = final_html[,"Variable"],
                                      rowlabel = htmltitle,
+                                     caption = htmlcaption,
                                      escape.html = F,
                                      cgroup = cgroup,
                                      n.cgroup = n.cgroup,
@@ -1031,6 +942,7 @@ nicetable <- function(df,
                                       header = nms[2:length(nms)],
                                       rnames = final_html[,"Variable"],
                                       rowlabel = htmltitle,
+                                      caption = htmlcaption,
                                       cgroup = cgroup,
                                       n.cgroup = n.cgroup,
                                       escape.html = F,

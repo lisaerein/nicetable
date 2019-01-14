@@ -4,13 +4,14 @@
 \alias{nicetable}
 \title{Lisa's Summary Table Function}
 \usage{
-nicetable(df, covs, type, by = NA, warnmissby = FALSE, bylab = NA,
-  orderfreq = FALSE, labels = NA, stats = "mean_sd_median_range",
-  statlabs = TRUE, tests = NA, percent = 2, perc.dec = 1,
-  cont.dec = 2, pval.dec = 3, allcol = TRUE, alllab = NA,
-  testcol = TRUE, pvalcol = TRUE, dispmiss = FALSE, dispN = FALSE,
-  mingroup = 0, mincell = 0, printRMD = TRUE, paired = FALSE, id = NA,
-  blanks = TRUE, htmlTable = FALSE, color = "#EEEEEE", byref = TRUE)
+nicetable(df, covs, type, labels = NA, by = NA, bylab = NA,
+  warnmissby = FALSE, tests = NA, orderfreq = FALSE,
+  dispmiss = TRUE, dispN = FALSE, stats = c("mean_sd", "median_q1q3",
+  "minmax"), percent = 2, perc.dec = 1, cont.dec = 2, pval.dec = 3,
+  allcol = TRUE, alllab = NA, testcol = TRUE, pvalcol = TRUE,
+  mingroup = 0, mincell = 0, printRMD = FALSE, paired = FALSE,
+  id = NA, blanks = TRUE, htmlTable = TRUE, htmltitle = "",
+  htmlcaption = "", color = "#EEEEEE", byref = TRUE)
 }
 \arguments{
 \item{df}{Dataframe object name (REQUIRED).}
@@ -19,20 +20,13 @@ nicetable(df, covs, type, by = NA, warnmissby = FALSE, bylab = NA,
 
 \item{type}{Vector indicating type of each covariate - use 1 for continuous and 2 for categorical (REQUIRED).}
 
-\item{by}{Variable to stratify by. Defaults to NA (no stratifying variable). No tests will be done.}
+\item{labels}{Labels for covariates. Default = NA in which case variable names will be used.}
 
-\item{warnmissby}{Whether to warn user that there are missing by variable values. Missing values will be excluded. Default = FALSE.}
+\item{by}{Variable to stratify by. Defaults to NA (no stratifying variable and no tests).}
 
 \item{bylab}{Label for stratification variable to use in warnmissby statement. Default is NA.}
 
-\item{orderfreq}{If TRUE, all unordered (non-factor) categorical variables will be ordered by descending frequency. Default = FALSE.}
-
-\item{labels}{Labels for covariates. Default = NA in which case variable names will be used.}
-
-\item{stats}{Statistics to display for continuous variables (mean_sd_median_range (default), mean_sd, mean_sem, median_range, or median_iqr). 
-Can be a vector or length one to apply to all continuous variables.}
-
-\item{statlabs}{If TRUE, continuous variable labels will include description of summary statistics. Default = FALSE.}
+\item{warnmissby}{Whether to warn user that there are missing by variable values. Missing values will be excluded. Default = FALSE.}
 
 \item{tests}{Vector of tests to calculate p-values. If only one is entered it will apply to all covs. 
 If NA (default), no tests will be done.
@@ -42,30 +36,52 @@ T-test ("ttest"), Chi-Squared ("chisq"),
 Kruskal-Wallis ("kw"), Mann-Whitney Rank Sum ("ranksum"), Anova ("anova"), 
 Fisher's Exact test ("fe") are currently supported.}
 
+\item{orderfreq}{If TRUE, all unordered (non-factor) categorical variables will be ordered by descending frequency. Default = FALSE.}
+
+\item{dispmiss}{Whether to display number of missing values. Default = TRUE.}
+
+\item{dispN}{Whether to display number non-missing values. Default = FALSE.}
+
+\item{stats}{Statistics to display for continuous variables, a character vector of the following options 
+(default = mean_sd, median_q1q3, minmax):
+mean, 
+sd, 
+median, 
+iqr,
+q1,
+q3,
+q1q3,
+min,
+max,
+minmax,
+range,
+sem,
+mean_sd,
+mean_sem,
+median_iqr,
+median_range,
+median_q1q3,
+median_minmax}
+
 \item{percent}{Should row (1) or column (2, default) percents be used?}
 
-\item{perc.dec}{Number of decimals for percentages (categorcal variables). Default = 1.}
+\item{perc.dec}{Number of decimal places for percentages (categorcal variables). Default = 1.}
 
-\item{cont.dec}{Number of decimals for continuous variable summary stats (mean, median, sd, iqr). Default = 2.}
+\item{cont.dec}{Number of decimal placess for continuous variable summary stats (mean, median, sd, iqr). Default = 2.}
 
-\item{pval.dec}{Number of significant figures for p-values. Default = 3.}
+\item{pval.dec}{Number of decimal places for p-values. Default = 3.}
 
 \item{allcol}{Whether to diplay the "All Data" column. Default = TRUE.}
 
-\item{alllab}{Label for All column (default = "All (n = )").}
+\item{alllab}{Label for All column (default = "All (N = )").}
 
 \item{testcol}{Whether to display the test column (names of tests). Default = TRUE.}
 
 \item{pvalcol}{Should a column be included for p-values? TRUE (default) or FALSE.}
 
-\item{dispmiss}{Whether to display number missing for continuous variables. Default = FALSE.}
+\item{mingroup}{Minimum non-missing group size required to report p-value (0 by default to report all p-values).}
 
-\item{dispN}{Whether to display number non-missing for continuous variables. Default = FALSE. 
-dispN will overwrite dispmiss if both are TRUE.}
-
-\item{mingroup}{Minimum non-missing group size needed to report p-value (0 by default - report all p-values).}
-
-\item{mincell}{Minimum non-missing cell size needed to report p-value (0 by default - report all p-values).}
+\item{mincell}{Minimum non-missing cell size required to report p-value (0 by default to report all p-values).}
 
 \item{printRMD}{Whether to print resulting table to Rmd via xtable. Default = TRUE.}
 
@@ -73,19 +89,20 @@ dispN will overwrite dispmiss if both are TRUE.}
 
 \item{id}{ID number to sort for paired data}
 
-\item{blanks}{Should blank rows be used as variable separators? Default = TRUE.}
+\item{blanks}{Should blank rows be used as variable separators (useful only for printRMD option)? Default = TRUE.}
 
 \item{htmlTable}{Whether to use htmlTable package to display table (instead of xtable). Default = FALSE.}
 
-\item{color}{Hex color to use for htmlTable output. Default = "#EEEEEE" (grey).}
+\item{htmltitle}{Title for 1st column in htmlTable.}
 
-\item{byref}{Should reference "by" category column be included (default = TRUE)}
+\item{color}{Hex color to use for htmlTable output. Default = "#EEEEEE" (light grey).}
+
+\item{byref}{Should reference "by" category column be included (default = TRUE).}
 }
 \description{
-This function creates a nice looking summary table similar 
-to the Mayo clinic SAS table macro. The function returns a dataframe. 
-The function also prints an html table by default for use in R markdown documents.
+This function creates a nice looking summary table.  
+The function returns a dataframe and prints an html table by default for use in R markdown documents.
 }
-\keyword{lisa}
+\keyword{Lisa}
 \keyword{summary}
 \keyword{table}
