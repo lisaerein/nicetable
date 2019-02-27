@@ -1,0 +1,127 @@
+---
+title: '''nicetable'' R package example'
+author: "Lisa Rein"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+### Load R packages 
+
+```{r results='hide', warning=FALSE, message=FALSE}
+
+packs <- c("devtools",
+           "knitr",
+           "MASS",
+           "htmlTable")
+
+lapply(packs, function(x) require(x, character.only = T))
+
+install_github("lisaerein/nicetable")
+library(nicetable)
+
+help(nicetable)
+
+```
+
+### Load _survey_ example dataset from the MASS package
+
+```{r}
+
+head(survey <- survey)
+
+```
+
+### Create a summary table for all results
+
+* Required arguments:
+
+        + df: name of data frame.
+        + covs: character vector of column names to include in table.
+        + type: numeric vector of variable types (1 for continuous and 2 for categorical).
+
+```{r results='asis', warning=FALSE}
+
+tab <- nicetable(df = survey,
+                  covs = names(survey),
+                  type = c(2,1,1,2,2,1,2,2,2,1,2,1))
+
+```
+
+### Choose summary statistics for continuous variables and use 1 decimal place. Use labels instead of variable names.
+
+```{r results='asis', warning=FALSE}
+
+labs <- c("Gender",
+          "Span of writing hand",
+          "Span of non-writing hand",
+          "Writing hand",
+          "Which arm is on top when you fold your arms?",
+          "Pulse (bpm)",
+          "Which arm is on top when you clap?",
+          "Exercise frequency",
+          "Smoking frequency",
+          "Height (cm)",
+          "Which units did students use",
+          "Age (years)")
+
+tab <- nicetable(df = survey,
+                 covs = names(survey),
+                 labels = labs,
+                 type = c(2,1,1,2,2,1,2,2,2,1,2,1),
+                 stats = c("mean_sd", "median", "iqr", "range"),
+                 cont.dec = 1)
+
+```
+
+### Create summary table stratified by gender
+
+```{r results='asis', warning=FALSE}
+
+tab <- nicetable(df = survey,
+                 by = "Sex",
+                 covs = names(survey)[-1],
+                 type = c(1,1,2,2,1,2,2,2,1,2,1))
+
+```
+
+### Change percentages from row to column percentages and use 2 decimal places. Add a row to the number of non-missing values.
+
+```{r results='asis', warning=FALSE}
+
+tab <- nicetable(df = survey,
+                 by = "Sex",
+                 covs = names(survey)[-1],
+                 type = c(1,1,2,2,1,2,2,2,1,2,1),
+                 percent = 1,
+                 perc.dec = 2,
+                 dispN = TRUE)
+
+```
+
+### Add p-values for statistical comparisons. Select tests automatically using non-parametric methods.
+
+```{r results='asis', warning=FALSE}
+
+tab <- nicetable(df = survey,
+                 by = "Sex",
+                 covs = names(survey)[-1],
+                 type = c(1,1,2,2,1,2,2,2,1,2,1),
+                 tests = "np")
+
+```
+
+### Remove "All" column. Change striping colors. Add a title. Change to parametric tests.
+
+```{r results='asis', warning=FALSE}
+
+tab <- nicetable(df = survey,
+                 allcol = FALSE,
+                 by = "Sex",
+                 covs = names(survey)[-1],
+                 type = c(1,1,2,2,1,2,2,2,1,2,1),
+                 tests = "p",
+                 htmlcaption = "Table 1: Survey responses by gender",
+                 htmltitle = "Survey questions",
+                 color = "powderblue")
+
+```
