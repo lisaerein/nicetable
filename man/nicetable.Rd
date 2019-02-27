@@ -10,7 +10,7 @@ nicetable(df, covs, type, labels = NA, by = NA, bylab = NA,
   stats = c("mean_sd", "median_q1q3", "minmax"), cont.dec = 2,
   dispmiss = TRUE, dispN = FALSE, tests = NA, pval.dec = 3,
   testcol = TRUE, pvalcol = TRUE, mingroup = 0, mincell = 0,
-  paired = FALSE, printRMD = FALSE, htmlTable = TRUE,
+  paired = FALSE, altp = NA, printRMD = FALSE, htmlTable = TRUE,
   htmltitle = "", htmlcaption = "", color = "#EEEEEE",
   blanks = TRUE, byref = TRUE)
 }
@@ -69,6 +69,8 @@ Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.}
 \item{mincell}{Minimum non-missing cell size required to report p-value (0 by default to report all p-values).}
 
 \item{paired}{Indicator (logical) to use a test for paired data (only available for ttest and ranksum). Default = FALSE.}
+
+\item{altp}{Numeric vector for alternative p-values to use (default is NA, use regular p-values).}
 
 \item{printRMD}{Indicator (logical) to print resulting table to Rmd via xtable. Default = FALSE.}
 

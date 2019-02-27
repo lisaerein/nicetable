@@ -34,6 +34,7 @@
 #' @param mingroup Minimum non-missing group size required to report p-value (0 by default to report all p-values).
 #' @param mincell Minimum non-missing cell size required to report p-value (0 by default to report all p-values). 
 #' @param paired Indicator (logical) to use a test for paired data (only available for ttest and ranksum). Default = FALSE.
+#' @param altp Numeric vector for alternative p-values to use (default is NA, use regular p-values).
 #' @param printRMD Indicator (logical) to print resulting table to Rmd via xtable. Default = FALSE.
 #' @param htmlTable Indicator (logical) to use htmlTable package to display table instead of xtable. Default = TRUE.
 #' @param htmltitle Character label for htmlTable variable names column. Default = " ".
@@ -88,6 +89,7 @@ nicetable <- function(
 		              mingroup = 0,
 		              mincell = 0,
 		              paired = FALSE,
+		              altp = NA,
 		              
 		              ### table formatting and options
                       printRMD = FALSE,
@@ -101,6 +103,15 @@ nicetable <- function(
     simpleCap <- function(x) {
       s <- strsplit(x, " ")[[1]]
       paste(toupper(substring(s, 1,1)), substring(s, 2), sep="", collapse=" ")
+    }
+    
+    if (sum(!is.na(altp)) > 0){ 
+        if (length(altp) != length(covs)) altp <- NA
+        if (length(altp) == length(covs)){
+            testcol <- FALSE
+            tests <- "p"
+        } 
+        
     }
     
     if (is.na(by)){
@@ -520,6 +531,7 @@ nicetable <- function(
                     testlabs[k] <- NA
                 } 
                 
+                if (sum(!is.na(altp)) > 0) p <- altp[k]
                 tmp[1,(3+nlevels(df[,by]))] <- sprintf(pvalf, round(p, pval.dec))
                 if (is.na(p)) {
                     tmp[1,(3+nlevels(df[,by]))] <- "--"
@@ -692,6 +704,7 @@ nicetable <- function(
                         }
                     } 
                 
+                    if (sum(!is.na(altp)) > 0) p <- altp[k]
                     tmp[1,(3+nlevels(df[,by]))] <- sprintf(pvalf, round(p, pval.dec))
                     if (is.na(p)) {
                         tmp[1,(3+nlevels(df[,by]))] <- "--"
@@ -770,6 +783,7 @@ nicetable <- function(
                       } 
                     }
                     
+                    if (sum(!is.na(altp), na.rm=T) > 0) p <- altp[k]
                     tmp[1,(3+nlevels(df[,by]))] <- sprintf(pvalf, round(p, pval.dec))
                     if (is.na(p)) {
                         tmp[1,(3+nlevels(df[,by]))] <- "--"
