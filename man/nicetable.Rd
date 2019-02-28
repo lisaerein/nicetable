@@ -8,11 +8,11 @@ nicetable(df, covs, type, labels = NA, by = NA, bylab = NA,
   warnmissby = FALSE, allcol = TRUE, alllab = NA,
   orderfreq = FALSE, percent = 2, perc.dec = 1,
   stats = c("mean_sd", "median_q1q3", "minmax"), cont.dec = 2,
-  dispmiss = TRUE, dispN = FALSE, tests = NA, pval.dec = 3,
-  testcol = TRUE, pvalcol = TRUE, mingroup = 0, mincell = 0,
-  paired = FALSE, altp = NA, printRMD = FALSE, htmlTable = TRUE,
-  htmltitle = "", htmlcaption = "", color = "#EEEEEE",
-  blanks = TRUE, byref = TRUE)
+  dispmiss = TRUE, dispN = FALSE, tests = NA, exact = FALSE,
+  pval.dec = 3, testcol = TRUE, pvalcol = TRUE, mingroup = 0,
+  mincell = 0, paired = FALSE, altp = NA, printRMD = FALSE,
+  htmlTable = TRUE, htmltitle = "", htmlcaption = "",
+  color = "#EEEEEE", blanks = TRUE, byref = TRUE)
 }
 \arguments{
 \item{df}{Dataset, a dataframe object (REQUIRED).}
@@ -33,14 +33,14 @@ nicetable(df, covs, type, labels = NA, by = NA, bylab = NA,
 
 \item{alllab}{Character label for "All" column. Default = "All (N = )".}
 
-\item{orderfreq}{Indicator (logical) to order (non-factor) categorical variables by descending frequency. 
+\item{orderfreq}{Indicator (logical) to order (non-factor) categorical variables by descending frequency.
 Ordered factor variables will retain original ordering. Default = FALSE.}
 
 \item{percent}{Should row or column percents be used: 2 for row and 1 for column percents. Default is row percentages (2).}
 
 \item{perc.dec}{Number of decimal places for percentages (categorcal variables). Default = 1.}
 
-\item{stats}{Statistics to display for continuous variables, a character vector of the following options 
+\item{stats}{Statistics to display for continuous variables, a character vector of the following options
 (Default = mean_sd, median_q1q3, minmax): mean, sd, median, iqr, q1, q3, q1q3, min, max, minmax, range, sem,
 mean_sd, mean_sem, median_iqr, median_range, median_q1q3, median_minmax.}
 
@@ -50,13 +50,15 @@ mean_sd, mean_sem, median_iqr, median_range, median_q1q3, median_minmax.}
 
 \item{dispN}{Indicator (logical) to display number of non-missing values. Default = FALSE.}
 
-\item{tests}{Character vector of tests to calculate p-values. If only one is entered it will apply to all variables. 
+\item{tests}{Character vector of tests to calculate p-values. If only one is entered it will apply to all variables.
 If NA (default), no tests will be done.
-Parametric ("p": T-test, Chi-squared, Anova, etc.), 
-Non-Parametric ("np": Rank-sum, Fisher's exact, Kruskal-Wallis, etc.), 
+Parametric ("p": T-test, Chi-squared, Anova, etc.),
+Non-Parametric ("np": Rank-sum, Fisher's exact, Kruskal-Wallis, etc.),
 T-test ("ttest"), Wilcoxon/Mann-Whitney Rank-sum ("ranksum"),
 Chi-squared ("chisq"), Fisher's Exact test ("fe"),
 Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.}
+
+\item{exact}{Logical indicator to use exact version of Wilcoxon rank-sum and Kruskal-Wallis tests (using coin package). Default = FALSE.}
 
 \item{pval.dec}{Number of decimal places for p-values. Default = 3.}
 
@@ -87,7 +89,7 @@ Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.}
 \item{byref}{Indicator (logical) to include reference "by" category column be included (default = TRUE).}
 }
 \description{
-This function creates a nice looking summary table.  
+This function creates a nice looking summary table.
 It returns a dataframe and prints an html table by default for use in R markdown documents.
 }
 \keyword{Lisa}
