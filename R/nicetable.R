@@ -28,7 +28,7 @@
 #' T-test ("ttest"), Wilcoxon/Mann-Whitney Rank-sum ("ranksum"),
 #' Chi-squared ("chisq"), Fisher's Exact test ("fe"),
 #' Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.
-#' @param exact Logical indicator to use exact version of Wilcoxon rank-sum and Kruskal-Wallis tests (using coin package). Default = FALSE.
+#' @param exact Logical indicator to use exact version of Wilcoxon rank-sum test (using coin package). Default = FALSE.
 #' @param pval.dec Number of decimal places for p-values. Default = 3.
 #' @param testcol Indicator (logical) to display column with statistical test names. Default = TRUE.
 #' @param pvalcol Indicator (logical) to display column with p-values. Default = TRUE.
@@ -47,9 +47,8 @@
 #' @importFrom xtable xtable
 #' @importFrom knitr knit_print
 #' @importFrom htmlTable htmlTable
-#' @importFrom coin wilcox_test wilcoxsign_test kruskal_test pvalue
+#' @importFrom coin wilcox_test wilcoxsign_test pvalue
 #' @importFrom MASS polr
-#' @importFrom kSamples jt.test
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
 #' @export
@@ -453,10 +452,6 @@ nicetable <- function(
                       if (is.finite(kruskal.test(form, data=df)$p.value)){
                         p <- kruskal.test(form, data=df)$p.value
                         testlabs[k] <- "Kruskal-Wallis"
-                        if (exact){
-                            p <- pvalue(kruskal_test(form, data=df, distribution="exact"))
-                            testlabs[k] <- "Kruskal-Wallis (Ex)"
-                        }
                       }
                       if (!is.finite(kruskal.test(form, data= df)$p.value)){
                         p <- NA
@@ -508,7 +503,7 @@ nicetable <- function(
                       testlabs[k] <- "Jonckheere-Terpstra trend"
                     }
                   }
-                  #
+                  # kSamples package function jt.test
                   # if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
                   #   p <- jt.test(form, data= df)[[6]][4]
                   #   testlabs[k] <- "Jonckheere-Terpstra trend"
@@ -786,10 +781,6 @@ nicetable <- function(
                         if (length(try_kw) > 1 & is.finite(kruskal.test(form, data=df)$p.value)){
                             p <- kruskal.test(form, data=df)$p.value
                             testlabs[k] <- "Kruskal-Wallis"
-                            if (exact){
-                                p <- pvalue(kruskal_test(form, data=df, distribution="exact"))
-                                testlabs[k] <- "Kruskal-Wallis (Ex)"
-                            }
                         }
                         if (length(try_kw) == 1 | !is.finite(kruskal.test(form, data=df)$p.value)){
                             p <- NA
@@ -851,7 +842,7 @@ nicetable <- function(
     if (!is.na(alllab)) all <- alllab
     if ( is.na(alllab)) all <- "All"
 
-    final_table <- data.frame(sum_table)
+    final_table <- data.frame(sum_table, row.names = make.names(sum_table[,1], unique = T))
 
     ### column names for non-html version
     names(final_table) <- c("Variable",

@@ -58,7 +58,7 @@ T-test ("ttest"), Wilcoxon/Mann-Whitney Rank-sum ("ranksum"),
 Chi-squared ("chisq"), Fisher's Exact test ("fe"),
 Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.}
 
-\item{exact}{Logical indicator to use exact version of Wilcoxon rank-sum and Kruskal-Wallis tests (using coin package). Default = FALSE.}
+\item{exact}{Logical indicator to use exact version of Wilcoxon rank-sum test (using coin package). Default = FALSE.}
 
 \item{pval.dec}{Number of decimal places for p-values. Default = 3.}
 
