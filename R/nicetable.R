@@ -647,29 +647,44 @@ nicetable <- function(
 
             if (pval[k] == TRUE){
 
-                if (is.na(by)){
+                if (noby == 1){
                   if (tests[k] == "ranksum"){
 
-                    try_wilcox <- try(wilcox.test(as.numeric(df[,by])))
-
-                    if (length(try_wilcox) > 1 & is.finite(wilcox.test(form, data=df)$p.value)){
-                      p <- wilcox.test(form, data=df)$p.value
-                      testlabs[k] <- "Wilcoxon rank-sum"
-                      if (exact) {
-                          p <- pvalue(wilcox_test(form, data=df, distribution="exact"))
-                          testlabs[k] <- "Wilcoxon rank-sum (Ex)"
-                      }
+                    tryok <- FALSE
+                    if (length(try_wilcox <- try(wilcox.test(as.numeric(df[,covs[k]])), silent = F)) > 1) {
+                        wilcox <- try_wilcox
+                        tryok <- TRUE
                     }
-                    if (length(try_wilcox) == 1 | !is.finite(wilcox.test(form, data=df)$p.value)){
+                    if (tryok & is.finite(wilcox$p.value)){
+                      p <- wilcox$p.value
+                      testlabs[k] <- "Wilcoxon signed-rank"
+                    }
+                    if (!tryok | !is.finite(wilcox$p.value)){
                       p <- NA
                       testlabs[k] <- NA
                     }
                   }
+                  if (tests[k] == "ttest"){
+
+                        tryok <- FALSE
+                        if (length(try_ttest <- try(t.test(as.numeric(df[,covs[k]])), silent = F)) > 1){
+                            ttest <- try_ttest
+                            tryok <- TRUE
+                        }
+                        if (tryok & is.finite(ttest$p.value)){
+                            p <- ttest$p.value
+                            testlabs[k] <- "T-test"
+                        }
+                        if (!tryok | !is.finite(ttest$p.value)){
+                            p <- NA
+                            testlabs[k] <- NA
+                        }
+                    }
                 }
 
                 form <- as.formula(paste(covs[k], "~", by))
 
-                if (nlevels(df[,by]) == 2){
+                if (noby == 0 & nlevels(df[,by]) == 2){
 
                     lev1 <- levels(df[,by])[1]
                     lev2 <- levels(df[,by])[2]
@@ -723,41 +738,9 @@ nicetable <- function(
                             testlabs[k] <- NA
                         }
                     }
-
-                    if (sum(!is.na(altp)) > 0) p <- altp[k]
-                    tmp[1,(3+nlevels(df[,by]))] <- sprintf(pvalf, round(p, pval.dec))
-                    if (is.na(p)) {
-                        tmp[1,(3+nlevels(df[,by]))] <- "--"
-                        p <- 99
-                    }
-                    if (tests[k] == "--") {
-                      tmp[1,(3+nlevels(df[,by]))] <- "--"
-                      testlabs[k] <- "--"
-                      p <- 99
-                    }
-                    if (htmlTable){
-                      if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.0001"
-                      if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.001"
-                      if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.01"
-                      if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.9999"
-                      if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.999"
-                      if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.99"
-                    }
-                    if (!htmlTable){
-                      if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "< 0.0001"
-                      if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.001"
-                      if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.01"
-                      if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.9999"
-                      if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.999"
-                      if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.99"
-                    }
-
-                    if (!is.finite(p)) tmp[1,(3+nlevels(df[,by]))] <- "--"
-
-                    tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
                 }
 
-                if (nlevels(df[,by]) > 2){
+                if (noby == 0 & nlevels(df[,by]) > 2){
 
                     if (tests[k] == "ttest" | tests[k] == "anova"){
 
@@ -802,31 +785,37 @@ nicetable <- function(
                         testlabs[k] <- NA
                       }
                     }
-
-                    if (sum(!is.na(altp), na.rm=T) > 0) p <- altp[k]
-                    tmp[1,(3+nlevels(df[,by]))] <- sprintf(pvalf, round(p, pval.dec))
-                    if (is.na(p)) {
-                        tmp[1,(3+nlevels(df[,by]))] <- "--"
-                        p <- 99
-                    }
-                    if (htmlTable){
-                      if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.0001"
-                      if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.001"
-                      if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.01"
-                      if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.9999"
-                      if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.999"
-                      if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.99"
-                    }
-                    if (!htmlTable){
-                      if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "< 0.0001"
-                      if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.001"
-                      if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.01"
-                      if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.9999"
-                      if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.999"
-                      if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.99"
-                    }
-                    tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
                 }
+
+                if (sum(!is.na(altp)) > 0) p <- altp[k]
+                tmp[1,(3+nlevels(df[,by]))] <- sprintf(pvalf, round(p, pval.dec))
+                if (is.na(p)) {
+                    tmp[1,(3+nlevels(df[,by]))] <- "--"
+                    p <- 99
+                }
+                if (tests[k] == "--") {
+                    tmp[1,(3+nlevels(df[,by]))] <- "--"
+                    testlabs[k] <- "--"
+                    p <- 99
+                }
+                if (htmlTable){
+                    if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.0001"
+                    if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.001"
+                    if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.01"
+                    if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.9999"
+                    if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.999"
+                    if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.99"
+                }
+                if (!htmlTable){
+                    if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "< 0.0001"
+                    if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.001"
+                    if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.01"
+                    if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.9999"
+                    if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.999"
+                    if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.99"
+                }
+                if (!is.finite(p)) tmp[1,(3+nlevels(df[,by]))] <- "--"
+                tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
             }
 
             if (k %% 2 == 0) rgroup <- c(rgroup, rep("none", nrow(tmp)))
@@ -929,65 +918,21 @@ nicetable <- function(
             }
 
         ### create htmlTable
-            if (noby == 0){
-                htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
-                                     header = nms[2:length(nms)],
-                                     rnames = final_html[,"Variable"],
-                                     rowlabel = htmltitle,
-                                     caption = htmlcaption,
-                                     escape.html = F,
-                                     cgroup = cgroup,
-                                     n.cgroup = n.cgroup,
-                                     css.cell='border-collapse: collapse; padding: 4px;',
-                                     col.rgroup=rgroup)
+            htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
+                                 header = nms[2:length(nms)],
+                                 rnames = final_html[,"Variable"],
+                                 rowlabel = htmltitle,
+                                 caption = htmlcaption,
+                                 escape.html = F,
+                                 cgroup = cgroup,
+                                 n.cgroup = n.cgroup,
+                                 css.cell='border-collapse: collapse; padding: 4px;',
+                                 col.rgroup=rgroup)
 
-                print(htmlver)
-                # knit_print(htmlver)
-                # html_print(htmlver)
-                return(final_table)
-            }
-
-            if (noby == 1){
-
-                for (i in 1:ncol(final_html)){
-                    final_html[,i] <- as.character(final_html[,i])
-                }
-
-                data2 <- data.frame(final_html[,2:ncol(final_html)])
-                if (ncol(final_html) > 2){
-                  names(data2) <- c(paste("n =", nrow(df)), "p-value", "Test")
-                }
-                if (ncol(final_html) == 2){
-                  names(data2) <- paste("n =", nrow(df))
-                }
-
-                if (ncol(final_html) > 2){
-                    cgroup <- c(all, "")
-                    n.cgroup <- c(rep(1, length(cgroup)-1), sum(names(data2) %in% c("p-value", "Test")))
-                }
-                if (ncol(final_html) == 2){
-                    cgroup <- c(all)
-                    n.cgroup <- c(rep(1, length(cgroup)))
-                }
-
-                 htmlver <- htmlTable(x = data2,
-                                      header = nms[2:length(nms)],
-                                      rnames = final_html[,"Variable"],
-                                      rowlabel = htmltitle,
-                                      caption = htmlcaption,
-                                      cgroup = cgroup,
-                                      n.cgroup = n.cgroup,
-                                      escape.html = F,
-                                      css.cell='border-collapse: collapse; padding: 4px;',
-                                      col.rgroup=rgroup)
-
-                 print(htmlver)
-                 # knit_print(htmlver)
-                 # html_print(htmlver)
-
-                names(final_table)[2] <- paste(all, " (n = ", nrow(df), ")", sep="")
-                return(final_table)
-            }
+            print(htmlver)
+            # knit_print(htmlver)
+            # html_print(htmlver)
+            return(final_table)
     }
 
 }
