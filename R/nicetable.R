@@ -101,6 +101,25 @@ nicetable <- function(
 		              blanks = TRUE,
 		              byref = TRUE){
 
+    # check required user inputs ---------------------------------------
+
+    try(if (class(df[1]) != "data.frame") stop("df must be a dataframe\n"))
+
+    ## remove any covs that do not appear in dataset
+    covs2 <- covs[covs %in% names(df)]
+    if (length(covs2) != length(covs)) cat("Warning! Covariate(s) do not exist:", covs[!(covs %in% names(df))],"\n")
+    covs <- covs2
+    type <- type[covs %in% names(df)]
+    try(if (length(covs) == 0) stop("No valid covs\n"))
+
+    ## check that all types are valid
+    if (length(type[!(type %in% c(1,2))]) > 0) cat("Warning! Invalid type for covariate(s): ", covs[!(type %in% c(1,2))], "\n")
+
+    ## check that by variable appears in dataset
+    by2 <- by[by %in% names(df)]
+    try(if (length(by2) != 1) stop("Grouping variable: ", by[!(by %in% names(df))]," does not exist in dataset\n"))
+    by <- by2
+
     simpleCap <- function(x) {
       s <- strsplit(x, " ")[[1]]
       paste(toupper(substring(s, 1,1)), substring(s, 2), sep="", collapse=" ")
