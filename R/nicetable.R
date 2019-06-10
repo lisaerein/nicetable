@@ -105,6 +105,11 @@ nicetable <- function(
 
     try(if (class(df[1]) != "data.frame") stop("df must be a dataframe\n"))
 
+    ### if only one variable type is entered, repeat for all variables
+    if (length(type) == 1) {
+        type <- rep(type, length(covs))
+    }
+
     ## remove any covs that do not appear in dataset
     covs2 <- covs[covs %in% names(df)]
     if (length(covs2) != length(covs)) cat("Warning! Covariate(s) do not exist:", covs[!(covs %in% names(df))],"\n")
@@ -222,11 +227,6 @@ nicetable <- function(
                           stringsAsFactors = FALSE)
     rownames(nicelab) <- nicelab$nicefun
     nicelab$fun <- unlist(lapply(nicelab[,"nicefun"], function(x) strsplit(x, "nice_")[[1]][2]))
-
-    ### if only one variable type is entered, repeat for all variables
-    if (length(type) == 1) {
-        type <- rep(type, length(covs))
-    }
 
     ### Use same stats for all continuous variables
     ### Trouble-shoot user error by removing bad values
