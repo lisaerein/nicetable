@@ -121,9 +121,11 @@ nicetable <- function(
     if (length(type[!(type %in% c(1,2))]) > 0) cat("Warning! Invalid type for covariate(s): ", covs[!(type %in% c(1,2))], "\n")
 
     ## check that by variable appears in dataset
-    by2 <- by[by %in% names(df)]
-    try(if (length(by2) != 1) stop("Grouping variable: ", by[!(by %in% names(df))]," does not exist in dataset\n"))
-    by <- by2
+    if (!is.na(by)){
+        by2 <- by[by %in% names(df)]
+        try(if (length(by2) != 1) stop("Grouping variable: ", by[!(by %in% names(df))]," does not exist in dataset\n"))
+        by <- by2
+    }
 
     simpleCap <- function(x) {
       s <- strsplit(x, " ")[[1]]

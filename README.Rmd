@@ -2,7 +2,7 @@
 title: '''nicetable'' R package example'
 author: "Lisa Rein"
 date: "`r Sys.Date()`"
-output: html_document
+output: github_document
 ---
 
 ### Load R packages 
