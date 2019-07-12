@@ -10,9 +10,9 @@ nicetable(df, covs, type, labels = NA, by = NA, bylab = NA,
   stats = c("mean_sd", "median_q1q3", "minmax"), cont.dec = 2,
   dispmiss = TRUE, dispN = FALSE, tests = NA, exact = FALSE,
   pval.dec = 3, testcol = TRUE, pvalcol = TRUE, mingroup = 0,
-  mincell = 0, paired = FALSE, altp = NA, printRMD = FALSE,
-  htmlTable = TRUE, htmltitle = "", htmlcaption = "",
-  color = "#EEEEEE", blanks = TRUE, byref = TRUE)
+  mincell = 0, paired = FALSE, altp = NA, kable = TRUE,
+  htmlTable = FALSE, htmltitle = "", caption = "",
+  color = "#EEEEEE", byref = TRUE)
 }
 \arguments{
 \item{df}{Dataset, a dataframe object (REQUIRED).}
@@ -74,17 +74,15 @@ Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.}
 
 \item{altp}{Numeric vector for alternative p-values to use (default is NA, use regular p-values).}
 
-\item{printRMD}{Indicator (logical) to print resulting table to Rmd via xtable. Default = FALSE.}
+\item{kable}{Indicator (logical) to use kable to display table. Default = TRUE.}
 
-\item{htmlTable}{Indicator (logical) to use htmlTable package to display table instead of xtable. Default = TRUE.}
+\item{htmlTable}{Indicator (logical) to use htmlTable package to display table instead of kable Default = FALSE.}
 
 \item{htmltitle}{Character label for htmlTable variable names column. Default = " ".}
 
-\item{htmlcaption}{Character title for htmlTable. Default = " ".}
+\item{caption}{Character title for htmlTable or kable table. Default = " ".}
 
 \item{color}{Character Hex color to use for htmlTable striping. Default = "#EEEEEE" (light grey).}
-
-\item{blanks}{Indicator (logical) to add blank rows as variable separators for printRMD option. Default = TRUE.}
 
 \item{byref}{Indicator (logical) to include reference "by" category column be included (default = TRUE).}
 }

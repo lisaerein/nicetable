@@ -36,16 +36,14 @@
 #' @param mincell Minimum non-missing cell size required to report p-value (0 by default to report all p-values).
 #' @param paired Indicator (logical) to use a test for paired data (only available for ttest and ranksum). Default = FALSE.
 #' @param altp Numeric vector for alternative p-values to use (default is NA, use regular p-values).
-#' @param printRMD Indicator (logical) to print resulting table to Rmd via xtable. Default = FALSE.
-#' @param htmlTable Indicator (logical) to use htmlTable package to display table instead of xtable. Default = TRUE.
+#' @param kable Indicator (logical) to use kable to display table. Default = TRUE.
+#' @param htmlTable Indicator (logical) to use htmlTable package to display table instead of kable Default = FALSE.
 #' @param htmltitle Character label for htmlTable variable names column. Default = " ".
-#' @param htmlcaption Character title for htmlTable. Default = " ".
+#' @param caption Character title for htmlTable or kable table. Default = " ".
 #' @param color Character Hex color to use for htmlTable striping. Default = "#EEEEEE" (light grey).
-#' @param blanks Indicator (logical) to add blank rows as variable separators for printRMD option. Default = TRUE.
 #' @param byref Indicator (logical) to include reference "by" category column be included (default = TRUE).
 #' @keywords summary table consulting Lisa
-#' @importFrom xtable xtable
-#' @importFrom knitr knit_print
+#' @importFrom knitr kable
 #' @importFrom htmlTable htmlTable
 #' @importFrom coin wilcox_test wilcoxsign_test pvalue
 #' @importFrom MASS polr
@@ -93,12 +91,11 @@ nicetable <- function(
 		              altp = NA,
 
 		              ### table formatting and options
-                      printRMD = FALSE,
-		              htmlTable = TRUE,
+		              kable = TRUE,
+		              htmlTable = FALSE,
 		              htmltitle = "",
-		              htmlcaption = "",
+		              caption = "",
                       color = "#EEEEEE",
-		              blanks = TRUE,
 		              byref = TRUE){
 
     # check required user inputs ---------------------------------------
@@ -145,9 +142,11 @@ nicetable <- function(
         byref = TRUE
     }
 
-    if (is.na(bylab) & !is.na(by)) bylab <- by
+    blanks <- TRUE
 
-    if (htmlTable == TRUE) printRMD = FALSE
+    htmlcaption <- caption
+
+    if (is.na(bylab) & !is.na(by)) bylab <- by
 
     noby <- 0
     noby[is.na(by)] <- 1
@@ -896,17 +895,13 @@ nicetable <- function(
         }
     }
 
-    if (printRMD == TRUE){
-        print(xtable(final_table), type='html', include.rownames=F)
+    if (htmlTable & kable) htmlTable <- FALSE
 
+    if (!htmlTable & !kable){
         return(final_table)
     }
 
-    if (printRMD == FALSE & htmlTable == FALSE){
-        return(final_table)
-    }
-
-    if (htmlTable == TRUE){
+    if (htmlTable){
 
         final_html <- final_table
 
@@ -952,8 +947,39 @@ nicetable <- function(
                                  col.rgroup=rgroup)
 
             print(htmlver)
-            # knit_print(htmlver)
-            # html_print(htmlver)
+            return(final_table)
+    }
+
+    if (kable){
+
+            for (i in 1:ncol(final_table)){
+                final_table[,i] <- as.character(final_table[,i])
+            }
+
+            final_table <- final_table[!is.na(final_table[,1]),]
+
+            ### get header rows
+            head <- which(is.na(final_table[,2]))
+            ### get non-header rows
+            nohead <- which(!is.na(final_table[,2]))
+            ### indent non-header rows and remove *
+            final_table[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
+                                                   substring(final_table[nohead,"Variable"], 3))
+            ### bold header rows
+            final_table[head,"Variable"] <- paste("<b>",
+                                                 final_table[head,"Variable"],
+                                                 "<b/>", sep="")
+
+            tabalign <- rep("c", ncol(final_table))
+            tabalign[1] <- "l"
+            if ("p-value" %in% names(final_table)) tabalign[which(names(final_table) == "p-value")] <- "r"
+            tabalign <- paste(tabalign, collapse="")
+
+            print(kable(x = final_table,
+                        row.names = FALSE,
+                        caption = htmlcaption,
+                        align = tabalign))
+
             return(final_table)
     }
 
