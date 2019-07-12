@@ -21,6 +21,8 @@ library(nicetable)
 
 help(nicetable)
 
+options(knitr.kable.NA = '.')
+
 ```
 
 ### Load _survey_ example dataset from the MASS package
@@ -120,7 +122,7 @@ tab <- nicetable(df = survey,
                  covs = names(survey)[-1],
                  type = c(1,1,2,2,1,2,2,2,1,2,1),
                  tests = "p",
-                 htmlcaption = "Table 1: Survey responses by gender",
+                 caption = "Table 1: Survey responses by gender",
                  htmltitle = "Survey questions",
                  color = "powderblue")
 
