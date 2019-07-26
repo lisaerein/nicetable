@@ -1,7 +1,7 @@
 ‘nicetable’ R package example
 ================
 Lisa Rein
-2019-07-12
+2019-07-26
 
 ### Load R packages
 
@@ -60,7 +60,7 @@ tab <- nicetable(df = survey,
                   type = c(2,1,1,2,2,1,2,2,2,1,2,1))
 ```
 
-| Variable          |      All (N = 237).1      |
+| Variable          |       All (N = 237)       |
 | :---------------- | :-----------------------: |
 | <b>Sex<b/>        |             .             |
 | Female            |        118 (50.0%)        |
@@ -145,71 +145,71 @@ tab <- nicetable(df = survey,
                  cont.dec = 1)
 ```
 
-| Variable                                            | All (N = 237).1 |
-| :-------------------------------------------------- | :-------------: |
-| <b>Gender<b/>                                       |        .        |
-| Female                                              |   118 (50.0%)   |
-| Male                                                |   118 (50.0%)   |
-| Freq Missing                                        |        1        |
-| <b>Span of writing hand<b/>                         |        .        |
-| Mean (SD)                                           |   18.7 (1.9)    |
-| Median                                              |      18.5       |
-| IQR                                                 |       2.3       |
-| Range                                               |      10.2       |
-| Freq Missing                                        |        1        |
-| <b>Span of non-writing hand<b/>                     |        .        |
-| Mean (SD)                                           |   18.6 (2.0)    |
-| Median                                              |      18.5       |
-| IQR                                                 |       2.2       |
-| Range                                               |      11.0       |
-| Freq Missing                                        |        1        |
-| <b>Writing hand<b/>                                 |        .        |
-| Left                                                |    18 (7.6%)    |
-| Right                                               |   218 (92.4%)   |
-| Freq Missing                                        |        1        |
-| <b>Which arm is on top when you fold your arms?<b/> |        .        |
-| L on R                                              |   99 (41.8%)    |
-| Neither                                             |    18 (7.6%)    |
-| R on L                                              |   120 (50.6%)   |
-| Freq Missing                                        |        0        |
-| <b>Pulse (bpm)<b/>                                  |        .        |
-| Mean (SD)                                           |   74.2 (11.7)   |
-| Median                                              |      72.5       |
-| IQR                                                 |      14.0       |
-| Range                                               |      69.0       |
-| Freq Missing                                        |       45        |
-| <b>Which arm is on top when you clap?<b/>           |        .        |
-| Left                                                |   39 (16.5%)    |
-| Neither                                             |   50 (21.2%)    |
-| Right                                               |   147 (62.3%)   |
-| Freq Missing                                        |        1        |
-| <b>Exercise frequency<b/>                           |        .        |
-| Freq                                                |   115 (48.5%)   |
-| None                                                |   24 (10.1%)    |
-| Some                                                |   98 (41.4%)    |
-| Freq Missing                                        |        0        |
-| <b>Smoking frequency<b/>                            |        .        |
-| Heavy                                               |    11 (4.7%)    |
-| Never                                               |   189 (80.1%)   |
-| Occas                                               |    19 (8.1%)    |
-| Regul                                               |    17 (7.2%)    |
-| Freq Missing                                        |        1        |
-| <b>Height (cm)<b/>                                  |        .        |
-| Mean (SD)                                           |   172.4 (9.8)   |
-| Median                                              |      171.0      |
-| IQR                                                 |      15.0       |
-| Range                                               |      50.0       |
-| Freq Missing                                        |       28        |
-| <b>Which units did students use<b/>                 |        .        |
-| Imperial                                            |   68 (32.5%)    |
-| Metric                                              |   141 (67.5%)   |
-| Freq Missing                                        |       28        |
-| <b>Age (years)<b/>                                  |        .        |
-| Mean (SD)                                           |   20.4 (6.5)    |
-| Median                                              |      18.6       |
-| IQR                                                 |       2.5       |
-| Range                                               |      56.2       |
-| Freq Missing                                        |        0        |
+| Variable                                            | All (N = 237) |
+| :-------------------------------------------------- | :-----------: |
+| <b>Gender<b/>                                       |       .       |
+| Female                                              |  118 (50.0%)  |
+| Male                                                |  118 (50.0%)  |
+| Freq Missing                                        |       1       |
+| <b>Span of writing hand<b/>                         |       .       |
+| Mean (SD)                                           |  18.7 (1.9)   |
+| Median                                              |     18.5      |
+| IQR                                                 |      2.3      |
+| Range                                               |     10.2      |
+| Freq Missing                                        |       1       |
+| <b>Span of non-writing hand<b/>                     |       .       |
+| Mean (SD)                                           |  18.6 (2.0)   |
+| Median                                              |     18.5      |
+| IQR                                                 |      2.2      |
+| Range                                               |     11.0      |
+| Freq Missing                                        |       1       |
+| <b>Writing hand<b/>                                 |       .       |
+| Left                                                |   18 (7.6%)   |
+| Right                                               |  218 (92.4%)  |
+| Freq Missing                                        |       1       |
+| <b>Which arm is on top when you fold your arms?<b/> |       .       |
+| L on R                                              |  99 (41.8%)   |
+| Neither                                             |   18 (7.6%)   |
+| R on L                                              |  120 (50.6%)  |
+| Freq Missing                                        |       0       |
+| <b>Pulse (bpm)<b/>                                  |       .       |
+| Mean (SD)                                           |  74.2 (11.7)  |
+| Median                                              |     72.5      |
+| IQR                                                 |     14.0      |
+| Range                                               |     69.0      |
+| Freq Missing                                        |      45       |
+| <b>Which arm is on top when you clap?<b/>           |       .       |
+| Left                                                |  39 (16.5%)   |
+| Neither                                             |  50 (21.2%)   |
+| Right                                               |  147 (62.3%)  |
+| Freq Missing                                        |       1       |
+| <b>Exercise frequency<b/>                           |       .       |
+| Freq                                                |  115 (48.5%)  |
+| None                                                |  24 (10.1%)   |
+| Some                                                |  98 (41.4%)   |
+| Freq Missing                                        |       0       |
+| <b>Smoking frequency<b/>                            |       .       |
+| Heavy                                               |   11 (4.7%)   |
+| Never                                               |  189 (80.1%)  |
+| Occas                                               |   19 (8.1%)   |
+| Regul                                               |   17 (7.2%)   |
+| Freq Missing                                        |       1       |
+| <b>Height (cm)<b/>                                  |       .       |
+| Mean (SD)                                           |  172.4 (9.8)  |
+| Median                                              |     171.0     |
+| IQR                                                 |     15.0      |
+| Range                                               |     50.0      |
+| Freq Missing                                        |      28       |
+| <b>Which units did students use<b/>                 |       .       |
+| Imperial                                            |  68 (32.5%)   |
+| Metric                                              |  141 (67.5%)  |
+| Freq Missing                                        |      28       |
+| <b>Age (years)<b/>                                  |       .       |
+| Mean (SD)                                           |  20.4 (6.5)   |
+| Median                                              |     18.6      |
+| IQR                                                 |      2.5      |
+| Range                                               |     56.2      |
+| Freq Missing                                        |       0       |
 
 ### Create summary table stratified by gender
 
