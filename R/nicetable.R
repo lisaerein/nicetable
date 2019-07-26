@@ -973,6 +973,9 @@ nicetable <- function(
             tabalign <- rep("c", ncol(final_table))
             tabalign[1] <- "l"
             if ("p-value" %in% names(final_table)) tabalign[which(names(final_table) == "p-value")] <- "r"
+
+            names(final_table) <- gsub(")\\.1$", ")", names(final_table))
+
             tabalign <- paste(tabalign, collapse="")
 
             print(kable(x = final_table,
