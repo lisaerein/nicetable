@@ -409,7 +409,7 @@ nicetable <- function(
 
                 freq <- table(df.complete[,covs[k]], df.complete[,by])
 
-                if (tests[k] == "fe") {
+                if (tests[k] == "fe" & (nrow(freq) > 1)) {
                     try_fe <- try(fisher.test(freq))
                     if (length(try_fe) >  1) {
                         p <- fisher.test(freq)$p.value
@@ -418,7 +418,7 @@ nicetable <- function(
                     ### if fisher's exact test will not run try chisq
                     if (length(try_fe) == 1) tests[k] <- "chisq"
                 }
-                if (tests[k] == "chisq") {
+                if (tests[k] == "chisq" & (nrow(freq) > 1)) {
                     try_chisq <- try(chisq.test(freq))
                     if (length(try_chisq) >  1){
                         p <- chisq.test(freq)$p.value
