@@ -10,7 +10,6 @@ Imports:
     MASS,
     xtable,
     htmlTable,
-    utils,
     multiCA,
     kSamples,
     clinfun,
