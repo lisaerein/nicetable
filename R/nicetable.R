@@ -47,6 +47,7 @@
 #' @importFrom htmlTable htmlTable
 #' @importFrom coin wilcox_test wilcoxsign_test pvalue
 #' @importFrom MASS polr
+#' @importFrom utils capture.output
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
 #' @export
@@ -410,9 +411,9 @@ nicetable <- function(
                 freq <- table(df.complete[,covs[k]], df.complete[,by])
 
                 if (tests[k] == "fe" & (nrow(freq) > 1)) {
-                    try_fe <- try(fisher.test(freq))
+                    co <- capture.output(try_fe <- try(fisher.test(freq)), type = "message")
                     if (length(try_fe) >  1) {
-                        p <- fisher.test(freq)$p.value
+                        co <- capture.output(p <- fisher.test(freq)$p.value, type = "message")
                         testlabs[k] <- "Fisher's exact"
                     }
                     ### if fisher's exact test will not run try chisq
