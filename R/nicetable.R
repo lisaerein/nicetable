@@ -38,6 +38,7 @@
 #' @param altp Numeric vector for alternative p-values to use (default is NA, use regular p-values).
 #' @param kable Indicator (logical) to use kable to display table. Default = TRUE.
 #' @param htmlTable Indicator (logical) to use htmlTable package to display table instead of kable Default = FALSE.
+#' @param use_flextable Indicator (logical) to use flextable package to display table. Default = FALSE.
 #' @param htmltitle Character label for htmlTable variable names column. Default = " ".
 #' @param caption Character title for htmlTable or kable table. Default = " ".
 #' @param color Character Hex color to use for htmlTable striping. Default = "#EEEEEE" (light grey).
@@ -50,53 +51,54 @@
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
 #' @export
-nicetable <- function(
+nicetable <- function(df
                       ### REQUIRED inputs
-                      df,
-                      covs,
-                      type,
+                      ,covs
+                      ,type
 
                       ### covariate labels
-                      labels = NA,
+                      ,labels = NA
 
                       ### stratification specifications
-                      by = NA,
-                      bylab = NA,
-                      warnmissby = FALSE,
-                      allcol = TRUE,
-                      alllab = NA,
+                      ,by = NA
+                      ,bylab = NA
+                      ,warnmissby = FALSE
+                      ,allcol = TRUE
+                      ,alllab = NA
 
                       ### categorical covariate options
-                      orderfreq = FALSE,
-                      percent = 2,
-                      perc.dec = 1,
+                      ,orderfreq = FALSE
+                      ,percent = 2
+                      ,perc.dec = 1
 
                       ### continuous covariate options
-                      stats = c("mean_sd", "median_q1q3", "minmax"),
-                      cont.dec = 2,
+                      ,stats = c("mean_sd", "median_q1q3", "minmax")
+                      ,cont.dec = 2
 
                       ### missing data reporting options
-                      dispmiss = TRUE,
-                      dispN = FALSE,
+                      ,dispmiss = TRUE
+                      ,dispN = FALSE
 
                       ### statistical tests and options
-                      tests = NA,
-                      exact = FALSE,
-                      pval.dec = 3,
-                      testcol = TRUE,
-                      pvalcol = TRUE,
-		              mingroup = 0,
-		              mincell = 0,
-		              paired = FALSE,
-		              altp = NA,
+                      ,tests = NA
+                      ,exact = FALSE
+                      ,pval.dec = 3
+                      ,testcol = TRUE
+                      ,pvalcol = TRUE
+		              ,mingroup = 0
+		              ,mincell = 0
+		              ,paired = FALSE
+		              ,altp = NA
 
 		              ### table formatting and options
-		              kable = TRUE,
-		              htmlTable = FALSE,
-		              htmltitle = "",
-		              caption = "",
-                      color = "#EEEEEE",
-		              byref = TRUE){
+		              ,kable = TRUE
+		              ,htmlTable = FALSE
+		              ,use_flextable = FALSE
+		              ,htmltitle = ""
+		              ,caption = ""
+                      ,color = "#EEEEEE"
+		              ,byref = TRUE
+		              ){
 
     # check required user inputs ---------------------------------------
 
@@ -854,56 +856,54 @@ nicetable <- function(
 
     final_table <- data.frame(sum_table, row.names = make.names(sum_table[,1], unique = T))
 
-    ### column names for non-html version
-    names(final_table) <- c("Variable",
-                            paste(all, " (N = ", nrow(df), ")", sep=""),
-                            paste(unlist(lapply(levels(df[,by]), simpleCap)),
-                                  " (N = ", table(df[,by]), ")", sep=""),
-                            "p-value",
-                            "Test")
+    ## header text
+    head_txt <- c("",
+                  all,
+                  paste(unlist(lapply(levels(df[,by]), simpleCap))),
+                  "",
+                  "")
 
-    ## header names for htmlTable
-    nms <- c("Variable",
-             paste("N =", nrow(df)),
-             paste("N =", table(df[,by])),
-             "p-value",
-             "Test")
+    ## header sample sizes
+    head_nms <- c("Variable",
+                  paste(" (N = ", nrow(df), ")", sep=""),
+                  paste(" (N = ", table(df[,by]), ")", sep=""),
+                  "p-value",
+                  "Test")
 
     # print(final_table)
 
-    if (pvalcol != TRUE | sum(!is.na(tests)) == 0){
-        nms <- nms[which(nms %in% c("p-value", "Test") == FALSE)]
-        final_table <- final_table[,which(names(final_table) %in% c("p-value", "Test") == FALSE)]
+    # grab only user requested columns
+    reqcols_n <- 1:ncol(final_table)
 
-    }
-    if (testcol != TRUE & pvalcol == TRUE){
-        nms <- nms[which(nms != "Test")]
-        final_table <- final_table[,which(names(final_table) != "Test")]
-    }
-    if (allcol == TRUE & byref != TRUE){
-            nms <- nms[c(1,2,4:ncol(final_table))]
-            final_table <- final_table[,c(1,2,4:ncol(final_table))]
-    }
-    if (allcol != TRUE){
-        if (byref == TRUE){
-            nms <- nms[c(1,3:ncol(final_table))]
-            final_table <- final_table[,c(1,3:ncol(final_table))]
-        }
-        if (byref != TRUE){
-            nms <- nms[c(1,4:ncol(final_table))]
-            final_table <- final_table[,c(1,4:ncol(final_table))]
-        }
-    }
+    pvalcol_n <- which(head_nms == "p-value")
+    testcol_n <- which(head_nms == "Test")
+    allcol_n <- min(which(head_txt == all))
+    varcol_n <- which(head_nms == "Variable")
+    othcol_n <- reqcols_n[!(reqcols_n %in% c(pvalcol_n, testcol_n, allcol_n, varcol_n))]
+
+    if (!pvalcol)                reqcols_n <- reqcols_n[!(reqcols_n %in% c(pvalcol_n))]
+    if (sum(!is.na(tests)) == 0) reqcols_n <- reqcols_n[!(reqcols_n %in% c(pvalcol_n, testcol_n))]
+    if (!testcol)                reqcols_n <- reqcols_n[!(reqcols_n %in% c(testcol_n))]
+
+    ## stratification but no 'all' column
+    if (!allcol & noby == 0) reqcols_n <- reqcols_n[!(reqcols_n %in% allcol_n)]
+
+    ## stratification but no 'reference' column
+    if (noby == 0 & !byref) reqcols_n <- reqcols_n[!(reqcols_n %in% min(othcol_n))]
+
+    ## no by-group stratification:
+    if (noby == 1) reqcols_n <- reqcols_n[reqcols_n %in% c(varcol_n, allcol_n, pvalcol_n, testcol_n)]
+
+    head_txt <- head_txt[reqcols_n]
+    head_nms <- head_nms[reqcols_n]
+    final_table <- final_table[,reqcols_n, drop=FALSE]
 
     if (htmlTable & kable) htmlTable <- FALSE
-
-    if (!htmlTable & !kable){
-        return(final_table)
-    }
 
     if (htmlTable){
 
         final_html <- final_table
+        names(final_html) <- paste(head_txt, head_nms, sep="")
 
         ### stop htmlTable from treating everything as a factor
         for (i in 1:ncol(final_html)){
@@ -923,20 +923,20 @@ nicetable <- function(
                                                 final_html[head,"Variable"],
                                                 "<b/>", sep="")
 
-            if (sum(nms %in% c("p-value", "Test")) == 0){
+            if (sum(head_nms %in% c("p-value", "Test")) == 0){
                 cgroup <- c(all, unlist(lapply(levels(df[,by]), simpleCap)))
                 if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
                 n.cgroup <- rep(1, length(cgroup))
             }
-            if (sum(nms %in% c("p-value", "Test") > 0)){
+            if (sum(head_nms %in% c("p-value", "Test") > 0)){
                 cgroup <- c(all, unlist(lapply(levels(df[,by]), simpleCap)), "")
                 if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
-                n.cgroup <- c(rep(1, length(cgroup)-1), sum(nms %in% c("p-value", "Test")))
+                n.cgroup <- c(rep(1, length(cgroup)-1), sum(head_nms %in% c("p-value", "Test")))
             }
 
         ### create htmlTable
             htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
-                                 header = nms[2:length(nms)],
+                                 header = head_nms[2:length(head_nms)],
                                  rnames = final_html[,"Variable"],
                                  rowlabel = htmltitle,
                                  caption = htmlcaption,
@@ -947,43 +947,138 @@ nicetable <- function(
                                  col.rgroup=rgroup)
 
             print(htmlver)
-            return(final_table)
+            return(final_html)
     }
 
     if (kable){
 
-            for (i in 1:ncol(final_table)){
-                final_table[,i] <- as.character(final_table[,i])
+            final_kable <- final_table
+            names(final_kable) <- paste(head_txt, head_nms, sep="")
+
+            for (i in 1:ncol(final_kable)){
+                final_kable[,i] <- as.character(final_kable[,i])
             }
 
-            final_table <- final_table[!is.na(final_table[,1]),]
+            final_kable <- final_kable[!is.na(final_kable[,1]),]
 
             ### get header rows
-            head <- which(is.na(final_table[,2]))
+            head <- which(is.na(final_kable[,2]))
             ### get non-header rows
-            nohead <- which(!is.na(final_table[,2]))
+            nohead <- which(!is.na(final_kable[,2]))
             ### indent non-header rows and remove *
-            final_table[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
-                                                   substring(final_table[nohead,"Variable"], 3))
+            final_kable[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
+                                                   substring(final_kable[nohead,"Variable"], 3))
+            final_kable[nohead,"Variable"] <- gsub("\n", "", final_kable[nohead,"Variable"],fixed = T)
+
             ### bold header rows
-            final_table[head,"Variable"] <- paste("<b>",
-                                                 final_table[head,"Variable"],
+            final_kable[head,"Variable"] <- paste("<b>",
+                                                 final_kable[head,"Variable"],
                                                  "<b/>", sep="")
 
-            tabalign <- rep("c", ncol(final_table))
+            tabalign <- rep("c", ncol(final_kable))
             tabalign[1] <- "l"
-            if ("p-value" %in% names(final_table)) tabalign[which(names(final_table) == "p-value")] <- "r"
+            if ("p-value" %in% names(final_kable)) tabalign[which(names(final_kable) == "p-value")] <- "r"
 
-            names(final_table) <- gsub(")\\.1$", ")", names(final_table))
+            names(final_kable) <- gsub(")\\.1$", ")", names(final_kable))
 
             tabalign <- paste(tabalign, collapse="")
 
-            print(kable(x = final_table,
+            print(kable(x = final_kable,
                         row.names = FALSE,
                         caption = htmlcaption,
                         align = tabalign))
 
-            return(final_table)
+            return(final_kable)
+    }
+
+    fillnas <- function(S) {
+        L <- !is.na(S)
+        c(S[L][1], S[L])[cumsum(L)+1]
+    }
+
+    if (use_flextable){
+
+        final_flex <- final_table
+
+        for (i in 1:ncol(final_flex)){
+            final_flex[,i] <- as.character(final_flex[,i])
+        }
+
+        final_flex <- final_flex[!is.na(final_flex[,1]),]
+
+        ### reformat grouped data for flextable
+        final_flex$flexgroup <- NA
+        final_flex$flexgroup[is.na(final_flex[,2])] <- final_flex[is.na(final_flex[,2]),1]
+        final_flex$flexgroup <- fillnas(final_flex$flexgroup)
+
+        if ("Test" %in% head_nms){
+            flex_testcol <- which(head_nms == "Test")
+            final_flex[,flex_testcol] <- fillnas(final_flex[,flex_testcol])
+        }
+        if ("p-value" %in% head_nms){
+            flex_pvalcol <- which(head_nms == "p-value")
+            final_flex[,flex_pvalcol] <- fillnas(final_flex[,flex_pvalcol])
+        }
+        final_flex <- final_flex[!is.na(final_flex[,2]),]
+        if ("p-value" %in% head_nms) final_flex[duplicated(final_flex$flexgroup, final_flex[,flex_pvalcol]), flex_pvalcol] <- NA
+        if ("Test" %in% head_nms) final_flex[duplicated(final_flex$flexgroup, final_flex[,flex_testcol]), flex_testcol] <- NA
+
+        ### indent non-header rows and remove *
+        final_flex[!is.na(final_flex[,2]),1] <- substring(final_flex[!is.na(final_flex[,2]),1], 3)
+        final_flex[!is.na(final_flex[,2]),1] <- gsub("\n", "", final_flex[!is.na(final_flex[,2]),1], fixed = T)
+
+        final_flex_gr <- as_grouped_data(final_flex, groups = "flexgroup")
+
+        head_nms_flex <- c("flexgroup", head_nms)
+        head_nms_flex[1:2] <- c("", "")
+        names(head_nms_flex) <- names(final_flex_gr)
+
+        head_txt_flex <- c("flexgroup", head_txt)
+        head_txt_flex[1:2] <- c("", "")
+        names(head_txt_flex) <- names(final_flex_gr)
+
+        if ("Test" %in% head_nms){
+            flex_testcol <- which(head_nms_flex == "Test")
+            final_flex_gr[,flex_testcol] <- c(final_flex_gr[,flex_testcol][-1], NA)
+        }
+        if ("p-value" %in% head_nms){
+            flex_pvalcol <- which(head_nms_flex == "p-value")
+            final_flex_gr[,flex_pvalcol] <- c(final_flex_gr[,flex_pvalcol][-1], NA)
+        }
+
+        ft <- flextable(final_flex_gr)
+
+        ## format header
+        ft <- delete_part(ft, part = "header")
+        ft <- add_header(x = ft
+                         ,values = head_nms_flex
+                         ,top = TRUE
+        )
+        ft <- add_header(x = ft
+                         ,values = head_txt_flex
+                         ,top = TRUE
+        )
+
+        ## text fonts and alignment
+        ft <- theme_booktabs(ft)
+        ft <- bold(ft, part = "header")
+        ft <- bold(ft, j = 1, i = ~ !is.na(flexgroup), bold = TRUE, part = "body" )
+        ft <- align(ft, align = "center", part = "all")
+        ft <- align(ft, align = "left", j = c(1,2))
+        if ("p-value" %in% head_nms) ft <- align(ft, align = "right", j = flex_pvalcol)
+        if ("Test" %in% head_nms) ft <- align(ft, align = "right", j = flex_testcol)
+
+        ft <- merge_h_range(ft, i = ~ !is.na(flexgroup), j1 = 1, j2 = 2)
+        ft <- merge_h_range(ft, part = "header", j1 = 1, j2 = 2)
+
+        knit_print(autofit(ft))
+
+        return(list("dat" = final_flex_gr
+                    ,"ft" = autofit(ft)
+                    ,"head_nms" = head_nms_flex
+                    ,"head_txt" = head_txt_flex
+                    )
+               )
     }
 
 }
