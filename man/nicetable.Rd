@@ -4,15 +4,40 @@
 \alias{nicetable}
 \title{Lisa's Summary Table Function}
 \usage{
-nicetable(df, covs, type, labels = NA, by = NA, bylab = NA,
-  warnmissby = FALSE, allcol = TRUE, alllab = NA,
-  orderfreq = FALSE, percent = 2, perc.dec = 1,
-  stats = c("mean_sd", "median_q1q3", "minmax"), cont.dec = 2,
-  dispmiss = TRUE, dispN = FALSE, tests = NA, exact = FALSE,
-  pval.dec = 3, testcol = TRUE, pvalcol = TRUE, mingroup = 0,
-  mincell = 0, paired = FALSE, altp = NA, kable = TRUE,
-  htmlTable = FALSE, htmltitle = "", caption = "",
-  color = "#EEEEEE", byref = TRUE)
+nicetable(
+  df,
+  covs,
+  type,
+  labels = NA,
+  by = NA,
+  bylab = NA,
+  warnmissby = FALSE,
+  allcol = TRUE,
+  alllab = NA,
+  orderfreq = FALSE,
+  percent = 2,
+  perc.dec = 1,
+  stats = c("mean_sd", "median_q1q3", "minmax"),
+  cont.dec = 2,
+  dispmiss = TRUE,
+  dispN = FALSE,
+  tests = NA,
+  exact = FALSE,
+  pval.dec = 3,
+  testcol = TRUE,
+  pvalcol = TRUE,
+  mingroup = 0,
+  mincell = 0,
+  paired = FALSE,
+  altp = NA,
+  kable = TRUE,
+  htmlTable = FALSE,
+  use_flextable = FALSE,
+  htmltitle = "",
+  caption = "",
+  color = "#EEEEEE",
+  byref = TRUE
+)
 }
 \arguments{
 \item{df}{Dataset, a dataframe object (REQUIRED).}
@@ -77,6 +102,8 @@ Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.}
 \item{kable}{Indicator (logical) to use kable to display table. Default = TRUE.}
 
 \item{htmlTable}{Indicator (logical) to use htmlTable package to display table instead of kable Default = FALSE.}
+
+\item{use_flextable}{Indicator (logical) to use flextable package to display table. Default = FALSE.}
 
 \item{htmltitle}{Character label for htmlTable variable names column. Default = " ".}
 

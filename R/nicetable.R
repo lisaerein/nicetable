@@ -50,6 +50,7 @@
 #' @importFrom MASS polr
 #' @importFrom clinfun jonckheere.test
 #' @importFrom multiCA multiCA.test
+#' @import flextable
 #' @export
 nicetable <- function(df
                       ### REQUIRED inputs
