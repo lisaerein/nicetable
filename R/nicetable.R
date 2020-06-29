@@ -984,10 +984,13 @@ nicetable <- function(df
 
             tabalign <- paste(tabalign, collapse="")
 
-            print(kable(x = final_kable,
-                        row.names = FALSE,
-                        caption = htmlcaption,
-                        align = tabalign))
+            print(kable(x = final_kable
+                        ,row.names = FALSE
+                        ,caption = htmlcaption
+                        ,align = tabalign
+                        ,format = "markdown"
+                        )
+                  )
 
             return(final_kable)
     }
