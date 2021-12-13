@@ -30,6 +30,7 @@ nicetable(
   mincell = 0,
   paired = FALSE,
   altp = NA,
+  fisher.test.workspace = 2e+05,
   kable = TRUE,
   htmlTable = FALSE,
   use_flextable = FALSE,
@@ -98,6 +99,8 @@ Anova ("anova"), and Kruskal-Wallis ("kw") are currently supported.}
 \item{paired}{Indicator (logical) to use a test for paired data (only available for ttest and ranksum). Default = FALSE.}
 
 \item{altp}{Numeric vector for alternative p-values to use (default is NA, use regular p-values).}
+
+\item{fisher.test.workspace}{Number. Use this to change the default workspace for fisher.test if desired. Default = 200000.}
 
 \item{kable}{Indicator (logical) to use kable to display table. Default = TRUE.}
 

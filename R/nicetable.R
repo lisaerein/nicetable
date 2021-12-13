@@ -36,6 +36,7 @@
 #' @param mincell Minimum non-missing cell size required to report p-value (0 by default to report all p-values).
 #' @param paired Indicator (logical) to use a test for paired data (only available for ttest and ranksum). Default = FALSE.
 #' @param altp Numeric vector for alternative p-values to use (default is NA, use regular p-values).
+#' @param fisher.test.workspace Number. Use this to change the default workspace for fisher.test if desired. Default = 200000.
 #' @param kable Indicator (logical) to use kable to display table. Default = TRUE.
 #' @param htmlTable Indicator (logical) to use htmlTable package to display table instead of kable Default = FALSE.
 #' @param use_flextable Indicator (logical) to use flextable package to display table. Default = FALSE.
@@ -90,6 +91,7 @@ nicetable <- function(df
 		              ,mincell = 0
 		              ,paired = FALSE
 		              ,altp = NA
+		              ,fisher.test.workspace = 200000
 
 		              ### table formatting and options
 		              ,kable = TRUE
@@ -413,9 +415,9 @@ nicetable <- function(df
                 freq <- table(df.complete[,covs[k]], df.complete[,by])
 
                 if (tests[k] == "fe" & (nrow(freq) > 1)) {
-                    try_fe <- try(fisher.test(freq), silent = TRUE)
+                    try_fe <- try(fisher.test(freq, workspace = fisher.test.workspace), silent = TRUE)
                     if (length(try_fe) >  1) {
-                        p <- fisher.test(freq)$p.value
+                        p <- fisher.test(freq, workspace = fisher.test.workspace)$p.value
                         testlabs[k] <- "Fisher's exact"
                     }
                     ### if fisher's exact test will not run try chisq
