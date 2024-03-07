@@ -87,21 +87,21 @@ nicetable <- function(df
                       ,pval.dec = 3
                       ,testcol = TRUE
                       ,pvalcol = TRUE
-		              ,mingroup = 0
-		              ,mincell = 0
-		              ,paired = FALSE
-		              ,altp = NA
-		              ,fisher.test.workspace = 200000
+                      ,mingroup = 0
+                      ,mincell = 0
+                      ,paired = FALSE
+                      ,altp = NA
+                      ,fisher.test.workspace = 200000
 
-		              ### table formatting and options
-		              ,kable = TRUE
-		              ,htmlTable = FALSE
-		              ,use_flextable = FALSE
-		              ,htmltitle = ""
-		              ,caption = ""
+                      ### table formatting and options
+                      ,kable = TRUE
+                      ,htmlTable = FALSE
+                      ,use_flextable = FALSE
+                      ,htmltitle = ""
+                      ,caption = ""
                       ,color = "#EEEEEE"
-		              ,byref = TRUE
-		              ){
+                      ,byref = TRUE
+){
 
     # check required user inputs ---------------------------------------
 
@@ -130,8 +130,8 @@ nicetable <- function(df
     }
 
     simpleCap <- function(x) {
-      s <- strsplit(x, " ")[[1]]
-      paste(toupper(substring(s, 1,1)), substring(s, 2), sep="", collapse=" ")
+        s <- strsplit(x, " ")[[1]]
+        paste(toupper(substring(s, 1,1)), substring(s, 2), sep="", collapse=" ")
     }
 
     if (sum(!is.na(altp)) > 0){
@@ -285,10 +285,10 @@ nicetable <- function(df
     if (sum(is.na(df[,by])) > 0){
         if (warnmissby == TRUE){
             if (sum(is.na(df[,by])) ==1){
-              cat("* Note there was 1 entry missing", bylab, "which was excluded from the table. \n\n")
+                cat("* Note there was 1 entry missing", bylab, "which was excluded from the table. \n\n")
             }
             if (sum(is.na(df[,by])) > 1){
-              cat("* Note there were", sum(is.na(df[,by])), "entries missing", bylab, "which were excluded from the table. \n\n")
+                cat("* Note there were", sum(is.na(df[,by])), "entries missing", bylab, "which were excluded from the table. \n\n")
             }
         }
     }
@@ -322,9 +322,9 @@ nicetable <- function(df
             ### + 1 names column + 1 pvalue column + 1 test name column
             ### the number of rows is the number of levels + 1 for varname/label
             ### if there are missing values add another row for missing totals
-                tmp <- matrix(data = NA,
-                              ncol = nlevels(df[,by]) + 4,
-                              nrow = 1 + nlevels(df[,covs[k]]))
+            tmp <- matrix(data = NA,
+                          ncol = nlevels(df[,by]) + 4,
+                          nrow = 1 + nlevels(df[,covs[k]]))
 
             ### add first column variable label and names of levels
             tmp[1,1] <- labels[k]
@@ -336,16 +336,16 @@ nicetable <- function(df
             ### if group size (NA's removed) is less than min, do not report p-values
             mingroup_tab <- as.matrix(table(df.complete[,by]))
             if (sum(mingroup_tab < mingroup, na.rm=T) > 0) {
-              pval[k] <- TRUE
-              tests[k] <- "--"
-              testlabs[k] <- "--"
+                pval[k] <- TRUE
+                tests[k] <- "--"
+                testlabs[k] <- "--"
             }
             ### if cell size (NA's removed) is less than min, do not report p-values
             mincell_tab <- as.matrix(table(df.complete[,covs[k]], df.complete[,by]))
             if (sum(mincell_tab < mincell, na.rm=T) > 0) {
-              pval[k] <- TRUE
-              tests[k] <- "--"
-              testlabs[k] <- "--"
+                pval[k] <- TRUE
+                tests[k] <- "--"
+                testlabs[k] <- "--"
             }
 
             freq.all <- table(df.complete[,covs[k]])
@@ -446,116 +446,116 @@ nicetable <- function(df
                 }
 
                 if (tests[k] %in% c("ranksum","kw")){
-                  if (noby==0 & nlevels(df[,by]) == 2){
-                    form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
-                    try_wilcox <- try(wilcox.test(form, data = df))
+                    if (noby==0 & nlevels(df[,by]) == 2){
+                        form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
+                        try_wilcox <- try(wilcox.test(form, data = df))
 
-                    if (length(try_wilcox) > 1){
-                      if (is.finite(wilcox.test(form, data= df)$p.value)){
-                        p <- wilcox.test(form, data= df)$p.value
-                        testlabs[k] <- "Wilcoxon rank-sum"
-                        if (exact) {
-                            p <- pvalue(wilcox_test(form, data = df, distribution = "exact"))
-                            testlabs[k] <- "Wilcoxon rank-sum (Ex)"
+                        if (length(try_wilcox) > 1){
+                            if (is.finite(wilcox.test(form, data= df)$p.value)){
+                                p <- wilcox.test(form, data= df)$p.value
+                                testlabs[k] <- "Wilcoxon rank-sum"
+                                if (exact) {
+                                    p <- pvalue(wilcox_test(form, data = df, distribution = "exact"))
+                                    testlabs[k] <- "Wilcoxon rank-sum (Ex)"
+                                }
+
+                            }
+                            if (!is.finite(wilcox.test(form, data= df)$p.value)){
+                                p <- NA
+                                testlabs[k] <- NA
+                            }
                         }
+                        if (length(try_wilcox) == 1){
+                            p <- NA
+                            testlabs[k] <- NA
+                        }
+                    }
+                    if (noby==0 & nlevels(df[,by]) > 2){
+                        form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
+                        try_kruskal <- try(kruskal.test(form, data = df))
 
-                      }
-                      if (!is.finite(wilcox.test(form, data= df)$p.value)){
-                        p <- NA
-                        testlabs[k] <- NA
-                      }
+                        if (length(try_kruskal) > 1){
+                            if (is.finite(kruskal.test(form, data=df)$p.value)){
+                                p <- kruskal.test(form, data=df)$p.value
+                                testlabs[k] <- "Kruskal-Wallis"
+                            }
+                            if (!is.finite(kruskal.test(form, data= df)$p.value)){
+                                p <- NA
+                                testlabs[k] <- NA
+                            }
+                        }
+                        if (length(try_kruskal) == 1){
+                            p <- NA
+                            testlabs[k] <- NA
+                        }
                     }
-                    if (length(try_wilcox) == 1){
-                      p <- NA
-                      testlabs[k] <- NA
-                    }
-                  }
-                  if (noby==0 & nlevels(df[,by]) > 2){
-                    form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
-                    try_kruskal <- try(kruskal.test(form, data = df))
+                    if (noby==1){
+                        try_wilcox <- try(wilcox.test(as.numeric(df[,covs[k]]),
+                                                      mu = (nlevels(df[,covs[k]])+1)/2))
 
-                    if (length(try_kruskal) > 1){
-                      if (is.finite(kruskal.test(form, data=df)$p.value)){
-                        p <- kruskal.test(form, data=df)$p.value
-                        testlabs[k] <- "Kruskal-Wallis"
-                      }
-                      if (!is.finite(kruskal.test(form, data= df)$p.value)){
-                        p <- NA
-                        testlabs[k] <- NA
-                      }
+                        if (length(try_wilcox) > 1 &
+                            is.finite(wilcox.test(as.numeric(df[,covs[k]]),
+                                                  mu = (nlevels(df[,covs[k]])+1)/2))){
+                            p <- wilcox.test(as.numeric(df[,covs[k]]),
+                                             mu = (nlevels(df[,covs[k]])+1)/2)$p.value
+                            testlabs[k] <- "Wilcoxon signed-rank"
+                            # print(p)
+                        }
+                        if (length(try_wilcox) == 1 |
+                            !is.finite(wilcox.test(as.numeric(df[,covs[k]]),
+                                                   mu = (nlevels(df[,covs[k]])+1)/2)$p.value)){
+                            p <- NA
+                            testlabs[k] <- NA
+                        }
                     }
-                    if (length(try_kruskal) == 1){
-                      p <- NA
-                      testlabs[k] <- NA
-                    }
-                  }
-                  if (noby==1){
-                    try_wilcox <- try(wilcox.test(as.numeric(df[,covs[k]]),
-                                                  mu = (nlevels(df[,covs[k]])+1)/2))
-
-                    if (length(try_wilcox) > 1 &
-                        is.finite(wilcox.test(as.numeric(df[,covs[k]]),
-                                              mu = (nlevels(df[,covs[k]])+1)/2))){
-                      p <- wilcox.test(as.numeric(df[,covs[k]]),
-                                       mu = (nlevels(df[,covs[k]])+1)/2)$p.value
-                      testlabs[k] <- "Wilcoxon signed-rank"
-                      # print(p)
-                    }
-                    if (length(try_wilcox) == 1 |
-                        !is.finite(wilcox.test(as.numeric(df[,covs[k]]),
-                                               mu = (nlevels(df[,covs[k]])+1)/2)$p.value)){
-                      p <- NA
-                      testlabs[k] <- NA
-                    }
-                  }
                 }
 
                 if (tests[k] == "jt"){
-                  ## create numeric versions of covariate by by variable
-                  numcovk <- as.numeric(df[,covs[k]])
-                  numby <- as.numeric(df[,by])
+                    ## create numeric versions of covariate by by variable
+                    numcovk <- as.numeric(df[,covs[k]])
+                    numby <- as.numeric(df[,by])
 
-                  # form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
-                  # try_jt <- try(jt.test(form, data = df))
+                    # form <- as.formula(paste("as.numeric(", covs[k], ") ~", by, sep=""))
+                    # try_jt <- try(jt.test(form, data = df))
 
-                  try_jt <- try(jonckheere.test(x = numcovk, g = numby))
+                    try_jt <- try(jonckheere.test(x = numcovk, g = numby))
 
-                  p <- NA
-                  testlabs[k] <- NA
-                  if ((length(try_jt) > 1)) {
-                    jtres <- jonckheere.test(x = numcovk, g = numby)
-                    if (is.finite(jtres$p.value)) {
-                      p <- jtres$p.value
-                      testlabs[k] <- "Jonckheere-Terpstra trend"
+                    p <- NA
+                    testlabs[k] <- NA
+                    if ((length(try_jt) > 1)) {
+                        jtres <- jonckheere.test(x = numcovk, g = numby)
+                        if (is.finite(jtres$p.value)) {
+                            p <- jtres$p.value
+                            testlabs[k] <- "Jonckheere-Terpstra trend"
+                        }
                     }
-                  }
-                  # kSamples package function jt.test
-                  # if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
-                  #   p <- jt.test(form, data= df)[[6]][4]
-                  #   testlabs[k] <- "Jonckheere-Terpstra trend"
-                  # }
-                  #
-                  # if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
-                  #   p <- NA
-                  #   testlabs[k] <- NA
-                  # }
+                    # kSamples package function jt.test
+                    # if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
+                    #   p <- jt.test(form, data= df)[[6]][4]
+                    #   testlabs[k] <- "Jonckheere-Terpstra trend"
+                    # }
+                    #
+                    # if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
+                    #   p <- NA
+                    #   testlabs[k] <- NA
+                    # }
                 }
 
                 if (tests[k] == "multica"){
-                  form <- as.formula(paste(covs[k], "~", by, sep=""))
-                  try_mca <- try(multiCA.test(form, data = df))
+                    form <- as.formula(paste(covs[k], "~", by, sep=""))
+                    try_mca <- try(multiCA.test(form, data = df))
 
-                  if (length(try_mca) > 1 &
-                      is.finite(as.numeric(multiCA.test(form, data= df)[[1]][3]))){
-                    p <- as.numeric(multiCA.test(form, data= df)[[1]][3])
-                    testlabs[k] <- "Cochran-Armitage trend"
-                  }
+                    if (length(try_mca) > 1 &
+                        is.finite(as.numeric(multiCA.test(form, data= df)[[1]][3]))){
+                        p <- as.numeric(multiCA.test(form, data= df)[[1]][3])
+                        testlabs[k] <- "Cochran-Armitage trend"
+                    }
 
-                  if (length(try_mca) == 1 |
-                      !is.finite(as.numeric(multiCA.test(form, data= df)[[1]][3]))){
-                    p <- NA
-                    testlabs[k] <- NA
-                  }
+                    if (length(try_mca) == 1 |
+                        !is.finite(as.numeric(multiCA.test(form, data= df)[[1]][3]))){
+                        p <- NA
+                        testlabs[k] <- NA
+                    }
                 }
                 ### if there is only one level of the covariate do not do any tests
                 if (nlevels(df[,covs[k]]) < 2){
@@ -570,26 +570,26 @@ nicetable <- function(df
                     p <- 99
                 }
                 if (tests[k] == "--") {
-                  tmp[1,(3+nlevels(df[,by]))] <- "--"
-                  testlabs[k] <- "--"
-                  p <- 99
+                    tmp[1,(3+nlevels(df[,by]))] <- "--"
+                    testlabs[k] <- "--"
+                    p <- 99
                 }
 
                 if (htmlTable){
-                  if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.0001"
-                  if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.001"
-                  if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.01"
-                  if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.9999"
-                  if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.999"
-                  if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.99"
+                    if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.0001"
+                    if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.001"
+                    if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "&lt; 0.01"
+                    if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.9999"
+                    if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.999"
+                    if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "&gt; 0.99"
                 }
                 if (!htmlTable){
-                  if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "< 0.0001"
-                  if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.001"
-                  if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.01"
-                  if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.9999"
-                  if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.999"
-                  if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.99"
+                    if (pval.dec == 4 & p < 0.0001) tmp[1,(3+nlevels(df[,by]))] <- "< 0.0001"
+                    if (pval.dec == 3 & p < 0.001 ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.001"
+                    if (pval.dec == 2 & p < 0.01  ) tmp[1,(3+nlevels(df[,by]))] <- "< 0.01"
+                    if (pval.dec == 4 & round(p,4) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.9999"
+                    if (pval.dec == 3 & round(p,3) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.999"
+                    if (pval.dec == 2 & round(p,2) == 1) tmp[1,(3+nlevels(df[,by]))] <- "> 0.99"
                 }
 
                 tmp[1,(4+nlevels(df[,by]))] <- testlabs[k]
@@ -612,9 +612,9 @@ nicetable <- function(df
             ### if group size (NA's removed) is less than min, do not report p-values
             mingroup_tab <- as.matrix(table(df.complete[,by]))
             if (sum(mingroup_tab < mingroup, na.rm=T) > 0) {
-              pval[k] <- TRUE
-              tests[k] <- "--"
-              testlabs[k] <- "--"
+                pval[k] <- TRUE
+                tests[k] <- "--"
+                testlabs[k] <- "--"
             }
 
             ### create a mini table for this variable alone
@@ -674,34 +674,42 @@ nicetable <- function(df
             if (pval[k] == TRUE){
 
                 if (noby == 1){
-                  if (tests[k] == "ranksum"){
+                    if (tests[k] == "ranksum"){
 
-                    tryok <- FALSE
-                    if (length(try_wilcox <- try(wilcox.test(as.numeric(df[,covs[k]])), silent = F)) > 1) {
-                        wilcox <- try_wilcox
-                        tryok <- TRUE
-                    }
-                    if (tryok & is.finite(wilcox$p.value)){
-                      p <- wilcox$p.value
-                      testlabs[k] <- "Wilcoxon signed-rank"
-                    }
-                    if (!tryok | !is.finite(wilcox$p.value)){
-                      p <- NA
-                      testlabs[k] <- NA
-                    }
-                  }
-                  if (tests[k] == "ttest"){
+                        wilcox <- try(wilcox.test(as.numeric(df[,covs[k]])), silent = F)
+                        tryok <- ifelse(class(wilcox) %in% "try-error", FALSE, TRUE)
 
-                        tryok <- FALSE
-                        if (length(try_ttest <- try(t.test(as.numeric(df[,covs[k]])), silent = F)) > 1){
-                            ttest <- try_ttest
-                            tryok <- TRUE
+                        if (tryok){
+                            if (is.finite(wilcox$p.value)){
+                                p <- wilcox$p.value
+                                testlabs[k] <- "Wilcoxon signed-rank"
+                            }
+                            if (!is.finite(wilcox$p.value)){
+                                p <- NA
+                                testlabs[k] <- NA
+                            }
                         }
-                        if (tryok & is.finite(ttest$p.value)){
-                            p <- ttest$p.value
-                            testlabs[k] <- "T-test"
+                        if (!tryok){
+                            p <- NA
+                            testlabs[k] <- NA
                         }
-                        if (!tryok | !is.finite(ttest$p.value)){
+                    }
+                    if (tests[k] == "ttest"){
+
+                        ttest <- try(t.test(as.numeric(df[,covs[k]])), silent = F)
+                        tryok <- ifelse(class(ttest) %in% "try-error", FALSE, TRUE)
+
+                        if (tryok){
+                            if (is.finite(ttest$p.value)){
+                                p <- ttest$p.value
+                                testlabs[k] <- "T-test"
+                            }
+                            if (!is.finite(ttest$p.value)){
+                                p <- NA
+                                testlabs[k] <- NA
+                            }
+                        }
+                        if (!tryok){
                             p <- NA
                             testlabs[k] <- NA
                         }
@@ -798,18 +806,18 @@ nicetable <- function(df
 
                     }
                     if (tests[k] == "jt"){
-                      form <- as.formula(paste(covs[k], " ~ ", by, sep=""))
-                      try_jt <- try(jt.test(form, data = df))
+                        form <- as.formula(paste(covs[k], " ~ ", by, sep=""))
+                        try_jt <- try(jt.test(form, data = df))
 
-                      if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
-                        p <- jt.test(form, data= df)[[6]][4]
-                        testlabs[k] <- "Jonckheere-Terpstra trend"
-                      }
+                        if (length(try_jt) > 1 & is.finite(jt.test(form, data= df)[[6]][4])){
+                            p <- jt.test(form, data= df)[[6]][4]
+                            testlabs[k] <- "Jonckheere-Terpstra trend"
+                        }
 
-                      if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
-                        p <- NA
-                        testlabs[k] <- NA
-                      }
+                        if (length(try_jt) == 1 | !is.finite(jt.test(form, data= df)[[6]][4])){
+                            p <- NA
+                            testlabs[k] <- NA
+                        }
                     }
                 }
 
@@ -913,88 +921,88 @@ nicetable <- function(df
             final_html[,i] <- as.character(final_html[,i])
         }
         ### remove blanks
-            final_html <- final_html[!is.na(final_html[,1]),]
+        final_html <- final_html[!is.na(final_html[,1]),]
         ### get header rows
-            head <- which(is.na(final_html[,2]))
+        head <- which(is.na(final_html[,2]))
         ### get non-header rows
-            nohead <- which(!is.na(final_html[,2]))
+        nohead <- which(!is.na(final_html[,2]))
         ### indent non-header rows and remove *
-            final_html[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
-                                                    substring(final_html[nohead,"Variable"], 3))
+        final_html[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
+                                               substring(final_html[nohead,"Variable"], 3))
         ### bold header rows
-            final_html[head,"Variable"] <- paste("<b>",
-                                                final_html[head,"Variable"],
-                                                "<b/>", sep="")
+        final_html[head,"Variable"] <- paste("<b>",
+                                             final_html[head,"Variable"],
+                                             "<b/>", sep="")
 
-            if (sum(head_nms %in% c("p-value", "Test")) == 0){
-                cgroup <- c(all, unlist(lapply(levels(df[,by]), simpleCap)))
-                if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
-                n.cgroup <- rep(1, length(cgroup))
-            }
-            if (sum(head_nms %in% c("p-value", "Test") > 0)){
-                cgroup <- c(all, unlist(lapply(levels(df[,by]), simpleCap)), "")
-                if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
-                n.cgroup <- c(rep(1, length(cgroup)-1), sum(head_nms %in% c("p-value", "Test")))
-            }
+        if (sum(head_nms %in% c("p-value", "Test")) == 0){
+            cgroup <- c(all, unlist(lapply(levels(df[,by]), simpleCap)))
+            if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
+            n.cgroup <- rep(1, length(cgroup))
+        }
+        if (sum(head_nms %in% c("p-value", "Test") > 0)){
+            cgroup <- c(all, unlist(lapply(levels(df[,by]), simpleCap)), "")
+            if (allcol == FALSE) cgroup <- cgroup[2:length(cgroup)]
+            n.cgroup <- c(rep(1, length(cgroup)-1), sum(head_nms %in% c("p-value", "Test")))
+        }
 
         ### create htmlTable
-            htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
-                                 header = head_nms[2:length(head_nms)],
-                                 rnames = final_html[,"Variable"],
-                                 rowlabel = htmltitle,
-                                 caption = htmlcaption,
-                                 escape.html = F,
-                                 cgroup = cgroup,
-                                 n.cgroup = n.cgroup,
-                                 css.cell='border-collapse: collapse; padding: 4px;',
-                                 col.rgroup=rgroup)
+        htmlver <- htmlTable(x = final_html[,2:ncol(final_html)],
+                             header = head_nms[2:length(head_nms)],
+                             rnames = final_html[,"Variable"],
+                             rowlabel = htmltitle,
+                             caption = htmlcaption,
+                             escape.html = F,
+                             cgroup = cgroup,
+                             n.cgroup = n.cgroup,
+                             css.cell='border-collapse: collapse; padding: 4px;',
+                             col.rgroup=rgroup)
 
-            print(htmlver)
-            return(final_html)
+        print(htmlver)
+        return(final_html)
     }
 
     if (kable){
 
-            final_kable <- final_table
-            names(final_kable) <- paste(head_txt, head_nms, sep="")
+        final_kable <- final_table
+        names(final_kable) <- paste(head_txt, head_nms, sep="")
 
-            for (i in 1:ncol(final_kable)){
-                final_kable[,i] <- as.character(final_kable[,i])
-            }
+        for (i in 1:ncol(final_kable)){
+            final_kable[,i] <- as.character(final_kable[,i])
+        }
 
-            final_kable <- final_kable[!is.na(final_kable[,1]),]
+        final_kable <- final_kable[!is.na(final_kable[,1]),]
 
-            ### get header rows
-            head <- which(is.na(final_kable[,2]))
-            ### get non-header rows
-            nohead <- which(!is.na(final_kable[,2]))
-            ### indent non-header rows and remove *
-            final_kable[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
-                                                   substring(final_kable[nohead,"Variable"], 3))
-            final_kable[nohead,"Variable"] <- gsub("\n", "", final_kable[nohead,"Variable"],fixed = T)
+        ### get header rows
+        head <- which(is.na(final_kable[,2]))
+        ### get non-header rows
+        nohead <- which(!is.na(final_kable[,2]))
+        ### indent non-header rows and remove *
+        final_kable[nohead,"Variable"] <- paste("&nbsp; &nbsp; &nbsp;",
+                                                substring(final_kable[nohead,"Variable"], 3))
+        final_kable[nohead,"Variable"] <- gsub("\n", "", final_kable[nohead,"Variable"],fixed = T)
 
-            ### bold header rows
-            final_kable[head,"Variable"] <- paste("<b>",
-                                                 final_kable[head,"Variable"],
-                                                 "<b/>", sep="")
+        ### bold header rows
+        final_kable[head,"Variable"] <- paste("<b>",
+                                              final_kable[head,"Variable"],
+                                              "<b/>", sep="")
 
-            tabalign <- rep("c", ncol(final_kable))
-            tabalign[1] <- "l"
-            if ("p-value" %in% names(final_kable)) tabalign[which(names(final_kable) == "p-value")] <- "r"
+        tabalign <- rep("c", ncol(final_kable))
+        tabalign[1] <- "l"
+        if ("p-value" %in% names(final_kable)) tabalign[which(names(final_kable) == "p-value")] <- "r"
 
-            names(final_kable) <- gsub(")\\.1$", ")", names(final_kable))
+        names(final_kable) <- gsub(")\\.1$", ")", names(final_kable))
 
-            tabalign <- paste(tabalign, collapse="")
+        tabalign <- paste(tabalign, collapse="")
 
-            print(kable(x = final_kable
-                        ,row.names = FALSE
-                        ,caption = htmlcaption
-                        ,align = tabalign
-                        ,format = "markdown"
-                        )
-                  )
+        print(kable(x = final_kable
+                    ,row.names = FALSE
+                    ,caption = htmlcaption
+                    ,align = tabalign
+                    ,format = "markdown"
+        )
+        )
 
-            return(final_kable)
+        return(final_kable)
     }
 
     fillnas <- function(S) {
@@ -1083,8 +1091,8 @@ nicetable <- function(df
                     ,"ft" = autofit(ft)
                     ,"head_nms" = head_nms_flex
                     ,"head_txt" = head_txt_flex
-                    )
-               )
+        )
+        )
     }
 
 }
